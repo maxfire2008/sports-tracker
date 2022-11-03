@@ -1,0 +1,18 @@
+race_type: Freestyle
+distance: 100m
+score_type: shortest_time
+participation:
+  red: 10
+  yellow: 1
+  blue: 7
+  green: 6
+results:
+  1:
+    student: benjamin.jefferson.00
+    score: "1:12.00"
+  2:
+    student: cynthia.lewis.00
+    score: "1:12.01"
+  3:
+    student: willie.golden.00
+    score: "1:13.05"
