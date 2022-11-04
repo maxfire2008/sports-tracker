@@ -1,1 +1,20 @@
-
+{% extends "base.html" %}
+{% block body %}
+    <h1>
+        Editing {{ race_file }}
+    </h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody id="table_body">
+        </tbody>
+    </table>
+    <script>const student_db = {{ student_db|safe }};</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuzzy-dropdown@1.0.0/dist/fuzzy-dropdown.min.js" integrity="sha256-OnEcVyboirQULgrfJZ1O7wvo3GvEHNzKxZDcNf5j3bM=" crossorigin="anonymous"></script>
+    <script src="/static/edit_race.js"></script>
+{% endblock %}
