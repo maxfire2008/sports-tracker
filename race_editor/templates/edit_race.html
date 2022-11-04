@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% block body %}
-    <h1>
-        Editing {{ race_file }}
-    </h1>
+    <h1>Editing {{ race_file }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    <input type="Text" id="search_box">
+                </th>
+            </tr>
+        </thead>
+        <tbody id="search_table_body"></tbody>
+    </table>
     <table>
         <thead>
             <tr>
@@ -13,8 +21,8 @@
         <tbody id="table_body">
         </tbody>
     </table>
-    <script>const student_db = {{ student_db|safe }};</script>
+    <script>const studentDB = {{ student_db|safe }};</script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fuzzy-dropdown@1.0.0/dist/fuzzy-dropdown.min.js" integrity="sha256-OnEcVyboirQULgrfJZ1O7wvo3GvEHNzKxZDcNf5j3bM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <script src="/static/edit_race.js"></script>
 {% endblock %}

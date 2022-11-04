@@ -1,62 +1,92 @@
-let id = 0;
+function searchStudentDB(pattern) {
+    student_list = [];
+    for (student_id of Object.keys(studentDB)) {
+        // console.log(student_id);
+        student_entry = studentDB[student_id];
+        student_entry["id"] = student_id;
+        student_list.push(student_entry);
+    }
+    const options = {
+        // isCaseSensitive: false,
+        // includeScore: false,
+        // shouldSort: true,
+        // includeMatches: false,
+        // findAllMatches: false,
+        // minMatchCharLength: 1,
+        // location: 0,
+        // threshold: 0.6,
+        // distance: 100,
+        // useExtendedSearch: false,
+        // ignoreLocation: false,
+        // ignoreFieldNorm: false,
+        // fieldNormWeight: 1,
+        keys: ["name", "preferred_name", "id"],
+    };
 
-function getUniqueId() {
-    return id++ + '';
+    const fuse = new Fuse(student_list, options);
+
+    return fuse.search(pattern);
 }
 
-let student_map = {};
-
-function new_row() {
-    let row_id = getUniqueId();
-    let row = document.createElement("tr");
-    row.classList.add("student");
-    let student_name_container = document.createElement("td");
-    let student_name_select = document.createElement("select");
-    student_name_select.id = "student_name_select"+row_id;
-    let blank_option = document.createElement("option");
-    blank_option.textContent = "-";
-    student_name_select.appendChild(blank_option);
-    for (let student_id of Object.keys(student_db)) {
-        let student_entry = student_db[student_id];
-        console.log(student_id, student_entry);
-        let student_option = document.createElement("option");
-        let smap_id = getUniqueId();
-        student_map[smap_id] = student_id;
-        student_option.value = smap_id;
-        student_option.textContent = student_entry["name"];
-        student_name_select.appendChild(student_option);
+function updateSearchHTML() {
+    let search_results = searchStudentDB(
+        document.getElementById("search_box").value
+    );
+    search_table_body.replaceChildren();
+    for (result of search_results) {
+        let row = document.createElement("tr");
+        let cell = document.createElement("td");
+        let button = document.createElement("button");
+        button.textContent = result.item.name;
+        button.dataset.item = JSON.stringify(result["item"]);
+        button.addEventListener("click", function () {
+            addStudentToResults(JSON.parse(this.dataset.item));
+        });
+        cell.appendChild(button);
+        row.appendChild(cell);
+        document.getElementById("search_table_body").appendChild(row);
     }
-    student_name_container.appendChild(student_name_select);
-    student_name_container.innerHTML += "<div id=\"fuzzSearch"+row_id+"\">\n" +
-        "  <div>\n" +
-        "    <span class=\"fuzzName\"></span>\n" +
-        "    <span class=\"fuzzArrow\"></span>\n" +
-        "  </div>\n" +
-        "  <div>\n" +
-        "    <input type=\"text\" value=\"\" class=\"fuzzMagicBox\" placeholder=\"search..\" />\n" +
-        "    <span class=\"fuzzSearchIcon\"></span>\n" +
-        "    <ul>\n" +
-        "    </ul>\n" +
-        "  </div>\n" +
-        "</div>";
+}
 
-    row.appendChild(student_name_container);
-    let time_container = document.createElement("td");
-    let time_input = document.createElement("input");
-    time_container.appendChild(time_input);
-    row.appendChild(time_container);
+function addStudentToResults(student_data) {
+    let row = document.createElement("tr");
+
+    let name = document.createElement("td");
+    name.textContent = student_data["name"];
+    row.appendChild(name);
+
+    let score_cell = document.createElement("td");
+
+    let score_input = document.createElement("input");
+    score_input.classList.add("student_time");
+    score_input.dataset.student_id = student_data["id"];
+    score_cell.appendChild(score_input);
+
+    row.appendChild(score_cell);
+
     document.getElementById("table_body").appendChild(row);
 
-    $("#student_name_select"+row_id).fuzzyDropdown({
-        mainContainer: '#fuzzSearch'+row_id,
-        arrowUpClass: 'fuzzArrowUp',
-        selectedClass: 'selected',
-        enableBrowserDefaultScroll: true
-    });
+    search_box.value = "";
+    search_table_body.replaceChildren();
+    document.getElementById("search_box").focus();
 }
 
-function toJSON() {
-    $(".student").each(function (student) {
-        console.log(student);
-    })
-}
+document
+    .getElementById("search_box")
+    .addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            let search_results = searchStudentDB(
+                document.getElementById("search_box").value
+            );
+            addStudentToResults(search_results[0]["item"]);
+        }
+    });
+
+document
+    .getElementById("search_box")
+    .addEventListener("input", updateSearchHTML);
+
+window.addEventListener("load", function () {
+    search_box.value = "";
+});
