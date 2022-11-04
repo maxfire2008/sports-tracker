@@ -28,19 +28,45 @@ function searchStudentDB(pattern) {
     return fuse.search(pattern);
 }
 
+function formatName(realName, preferredName) {
+    realNameSplit = realName.split(" ");
+    if (preferredName) {
+        return realNameSplit.slice(0, 1)+" ("+preferredName+") "+realNameSplit.slice(1).join(" ");
+    }
+    return realName
+}
+
+function filterOutExisting(search_results) {
+    filtered = [];
+    for (result of search_results) {
+        if (!Object.keys(toJSON()).includes(result["item"]["id"])) {
+            filtered.push(result);
+        }
+    }
+    return filtered;
+}
+
 function updateSearchHTML() {
-    let search_results = searchStudentDB(
-        document.getElementById("search_box").value
-    );
+    let search = document.getElementById("search_box").value;
     search_table_body.replaceChildren();
+    let search_results = filterOutExisting(
+        searchStudentDB(search)
+    );
+    if (search_results < 1 && search !== "") {
+        let row = document.createElement("tr");
+        let cell = document.createElement("td");
+        cell.textContent = "No results!";
+        row.appendChild(cell);
+        document.getElementById("search_table_body").appendChild(row);
+    }
     for (result of search_results) {
         let row = document.createElement("tr");
         let cell = document.createElement("td");
         let button = document.createElement("button");
-        button.textContent = result.item.name;
-        button.dataset.item = JSON.stringify(result["item"]);
+        button.textContent = formatName(result.item.name, result.item.preferred_name);
+        button.dataset.item = result["item"]["id"];
         button.addEventListener("click", function () {
-            addStudentToResults(JSON.parse(this.dataset.item));
+            addStudentToResults(this.dataset.student_id);
         });
         cell.appendChild(button);
         row.appendChild(cell);
@@ -48,18 +74,18 @@ function updateSearchHTML() {
     }
 }
 
-function addStudentToResults(student_data) {
+function addStudentToResults(studentID) {
     let row = document.createElement("tr");
 
     let name = document.createElement("td");
-    name.textContent = student_data["name"];
+    name.textContent = formatName(studentDB[studentID].name, studentDB[studentID].preferred_name);
     row.appendChild(name);
 
     let score_cell = document.createElement("td");
 
     let score_input = document.createElement("input");
-    score_input.classList.add("student_time");
-    score_input.dataset.student_id = student_data["id"];
+    score_input.classList.add("score_input");
+    score_input.dataset.student_id = studentID;
     score_cell.appendChild(score_input);
 
     row.appendChild(score_cell);
@@ -71,15 +97,28 @@ function addStudentToResults(student_data) {
     document.getElementById("search_box").focus();
 }
 
+function toJSON() {
+    let inputs = document.getElementsByClassName("score_input");
+    let scores = {};
+    for (let i = 0; i < inputs.length; i++) {
+        scores[inputs[i].dataset.student_id] = inputs[i].value;
+    }
+    return scores;
+}
+
 document
     .getElementById("search_box")
     .addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
             event.preventDefault();
-            let search_results = searchStudentDB(
-                document.getElementById("search_box").value
+            let search_results = filterOutExisting(
+                searchStudentDB(document.getElementById("search_box").value)
             );
-            addStudentToResults(search_results[0]["item"]);
+            if (search_results < 1) {
+                alert("No match!");
+            } else {
+                addStudentToResults(search_results[0]["item"]["id"]);
+            }
         }
     });
 
