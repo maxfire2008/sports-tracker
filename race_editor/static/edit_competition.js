@@ -43,15 +43,15 @@ function formatName(realName, preferredName) {
 }
 
 function filterOutExisting(search_results) {
-    // let JSONResults = toJSON();
-    // let filtered = [];
-    // for (result of search_results) {
-    //     if (!JSONResults.some((e) => e.student_id === result["item"]["id"])) {
-    //         filtered.push(result);
-    //     }
-    // }
-    // return filtered;
-    return search_results;
+    let JSONResults = toJSON();
+    let filtered = [];
+    for (result of search_results) {
+        if (!JSONResults.some((e) => e.student_id === result["item"]["id"])) {
+            filtered.push(result);
+        }
+    }
+    return filtered;
+    // return search_results;
 }
 
 function updateSearchHTML() {
