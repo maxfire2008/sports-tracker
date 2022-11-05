@@ -1,9 +1,9 @@
 function searchStudentDB(pattern) {
     student_list = [];
-    for (student_id of Object.keys(studentDB)) {
-        // console.log(student_id);
-        student_entry = studentDB[student_id];
-        student_entry["id"] = student_id;
+    for (studentID of Object.keys(studentDB)) {
+        // console.log(studentID);
+        student_entry = studentDB[studentID];
+        student_entry["id"] = studentID;
         student_list.push(student_entry);
     }
     const options = {
@@ -43,9 +43,10 @@ function formatName(realName, preferredName) {
 }
 
 function filterOutExisting(search_results) {
-    filtered = [];
+    let JSONResults = toJSON();
+    let filtered = [];
     for (result of search_results) {
-        if (!Object.keys(toJSON()).includes(result["item"]["id"])) {
+        if (!JSONResults.some((e) => e.student_id === result["item"]["id"])) {
             filtered.push(result);
         }
     }
@@ -71,9 +72,9 @@ function updateSearchHTML() {
             result.item.name,
             result.item.preferred_name
         );
-        button.dataset.item = result["item"]["id"];
+        button.dataset.studentID = result["item"]["id"];
         button.addEventListener("click", function () {
-            addStudentToResults(this.dataset.student_id);
+            addStudentToResults(this.dataset.studentID);
         });
         cell.appendChild(button);
         row.appendChild(cell);
@@ -81,7 +82,7 @@ function updateSearchHTML() {
     }
 }
 
-function addStudentToResults(studentID) {
+async function addStudentToResults(studentID) {
     let row = document.createElement("tr");
 
     let name = document.createElement("td");
@@ -95,10 +96,19 @@ function addStudentToResults(studentID) {
 
     let score_input = document.createElement("input");
     score_input.classList.add("score_input");
-    score_input.dataset.student_id = studentID;
+    score_input.dataset.studentID = studentID;
+    score_input.dataset.resultID = await serverAddResult(studentID);
     score_cell.appendChild(score_input);
 
     row.appendChild(score_cell);
+
+    let remove_cell = document.createElement("td");
+    let remove_button = document.createElement("button");
+    remove_button.addEventListener("click", deleteButton);
+    remove_button.textContent = "-";
+    remove_cell.appendChild(remove_button);
+
+    row.appendChild(remove_cell);
 
     document.getElementById("table_body").appendChild(row);
 
@@ -107,13 +117,77 @@ function addStudentToResults(studentID) {
     document.getElementById("search_box").focus();
 }
 
+async function deleteButton() {
+    let result_id =
+        this.parentElement.parentElement.getElementsByClassName(
+            "score_input"
+        )[0].dataset.resultID;
+    let delete_request_status = await serverDeleteResult(result_id);
+    if (delete_request_status === 200) {
+        this.parentElement.parentElement.remove();
+    } else {
+        alert(
+            "Error in deletion. Inform support of the error code " +
+                delete_request_status
+        );
+    }
+}
+
 function toJSON() {
     let inputs = document.getElementsByClassName("score_input");
-    let scores = {};
+    let scores = [];
     for (let i = 0; i < inputs.length; i++) {
-        scores[inputs[i].dataset.student_id] = inputs[i].value;
+        let result_content = {
+            id: inputs[i].dataset.resultID,
+            student_id: inputs[i].dataset.studentID,
+            score: inputs[i].value,
+        };
+        scores.push(result_content);
     }
     return scores;
+}
+
+async function serverAddResult(studentID) {
+    let response = await fetch("/add_result/" + competitionID, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            student_id: studentID,
+            competition_id: competitionID,
+        }),
+    });
+    if (response.status !== 200) {
+        alert(
+            "An error occurred in" +
+                "serverAddResult cite code: " +
+                response.status
+        );
+        throw Error("serverAddResult status " + response.status);
+    }
+    let body = await response.text();
+    console.log(body);
+    return body;
+}
+
+async function serverDeleteResult(resultID) {
+    let response = await fetch("/delete_result/" + resultID, {
+        method: "DELETE",
+    });
+    return response.status;
+}
+
+async function save() {
+    let response = await fetch("/save_competition/" + competitionID, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(toJSON()),
+    });
+    let body = await response.text();
+    console.log(body);
 }
 
 document

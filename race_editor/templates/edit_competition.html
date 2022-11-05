@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>Editing {{ competition_id }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    <input type="Text" id="search_box">
+                </th>
+            </tr>
+        </thead>
+        <tbody id="search_table_body">
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody id="table_body">
+        </tbody>
+    </table>
+    <script>const studentDB = {{ student_db|tojson|safe }};</script>
+    <script>const competitionID = {{ competition_id|tojson|safe }}</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+    <script src="/static/edit_competition.js"></script>
+    <script>
+        {% for result in results %}
+            let row = document.createElement("tr");
+
+            let name = document.createElement("td");
+            name.textContent = formatName(
+                studentDB[{{ result.student_id|tojson|safe }}].name,
+                studentDB[{{ result.student_id|tojson|safe }}].preferred_name
+            );
+            row.appendChild(name);
+
+            let score_cell = document.createElement("td");
+
+            let score_input = document.createElement("input");
+            score_input.value = {{ result.score|tojson|safe }};
+            score_input.classList.add("score_input");
+            score_input.dataset.studentID = {{ result.student_id|tojson|safe }};
+            score_input.dataset.resultID = {{ result.id|tojson|safe }};
+            score_cell.appendChild(score_input);
+
+            row.appendChild(score_cell);
+
+            let remove_cell = document.createElement("td");
+            let remove_button = document.createElement("button");
+            remove_button.addEventListener("click", deleteButton);
+            remove_button.textContent = "-";
+            remove_cell.appendChild(remove_button);
+
+            row.appendChild(remove_cell);
+
+            document.getElementById("table_body").appendChild(row);
+
+            search_box.value = "";
+            search_table_body.replaceChildren();
+            document.getElementById("search_box").focus();
+        {% endfor %}
+    </script>
+{% endblock %}
