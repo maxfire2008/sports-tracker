@@ -31,9 +31,15 @@ function searchStudentDB(pattern) {
 function formatName(realName, preferredName) {
     realNameSplit = realName.split(" ");
     if (preferredName) {
-        return realNameSplit.slice(0, 1)+" ("+preferredName+") "+realNameSplit.slice(1).join(" ");
+        return (
+            realNameSplit.slice(0, 1) +
+            " (" +
+            preferredName +
+            ") " +
+            realNameSplit.slice(1).join(" ")
+        );
     }
-    return realName
+    return realName;
 }
 
 function filterOutExisting(search_results) {
@@ -49,9 +55,7 @@ function filterOutExisting(search_results) {
 function updateSearchHTML() {
     let search = document.getElementById("search_box").value;
     search_table_body.replaceChildren();
-    let search_results = filterOutExisting(
-        searchStudentDB(search)
-    );
+    let search_results = filterOutExisting(searchStudentDB(search));
     if (search_results < 1 && search !== "") {
         let row = document.createElement("tr");
         let cell = document.createElement("td");
@@ -63,7 +67,10 @@ function updateSearchHTML() {
         let row = document.createElement("tr");
         let cell = document.createElement("td");
         let button = document.createElement("button");
-        button.textContent = formatName(result.item.name, result.item.preferred_name);
+        button.textContent = formatName(
+            result.item.name,
+            result.item.preferred_name
+        );
         button.dataset.item = result["item"]["id"];
         button.addEventListener("click", function () {
             addStudentToResults(this.dataset.student_id);
@@ -78,7 +85,10 @@ function addStudentToResults(studentID) {
     let row = document.createElement("tr");
 
     let name = document.createElement("td");
-    name.textContent = formatName(studentDB[studentID].name, studentDB[studentID].preferred_name);
+    name.textContent = formatName(
+        studentDB[studentID].name,
+        studentDB[studentID].preferred_name
+    );
     row.appendChild(name);
 
     let score_cell = document.createElement("td");
