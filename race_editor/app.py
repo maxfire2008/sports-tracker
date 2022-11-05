@@ -22,6 +22,13 @@ class Competition(db.Model):
 
 
 class Result(db.Model):
+    __table_args__ = (
+        db.UniqueConstraint(
+            "competition_id",
+            "student_id",
+            name="student_unique_in_competition"
+        ),
+    )
     id = db.Column(db.Integer, primary_key=True)
     competition_id = db.Column(db.Integer, db.ForeignKey(Competition.id))
     student_id = db.Column(db.String)  # , db.ForeignKey('competitions.id'))
@@ -78,4 +85,5 @@ def add_result(competition_id):
 def delete_result(result_id):
     # return "200 OK", 200
     Result.query.filter_by(id=result_id).delete()
+    db.session.commit()
     return "200 OK", 200

@@ -43,14 +43,15 @@ function formatName(realName, preferredName) {
 }
 
 function filterOutExisting(search_results) {
-    let JSONResults = toJSON();
-    let filtered = [];
-    for (result of search_results) {
-        if (!JSONResults.some((e) => e.student_id === result["item"]["id"])) {
-            filtered.push(result);
-        }
-    }
-    return filtered;
+    // let JSONResults = toJSON();
+    // let filtered = [];
+    // for (result of search_results) {
+    //     if (!JSONResults.some((e) => e.student_id === result["item"]["id"])) {
+    //         filtered.push(result);
+    //     }
+    // }
+    // return filtered;
+    return search_results;
 }
 
 function updateSearchHTML() {
@@ -82,7 +83,7 @@ function updateSearchHTML() {
     }
 }
 
-async function addStudentToResults(studentID) {
+function addResultElement(studentID, resultID, score=null) {
     let row = document.createElement("tr");
 
     let name = document.createElement("td");
@@ -95,9 +96,10 @@ async function addStudentToResults(studentID) {
     let score_cell = document.createElement("td");
 
     let score_input = document.createElement("input");
+    score_input.value = score;
     score_input.classList.add("score_input");
     score_input.dataset.studentID = studentID;
-    score_input.dataset.resultID = await serverAddResult(studentID);
+    score_input.dataset.resultID = resultID;
     score_cell.appendChild(score_input);
 
     row.appendChild(score_cell);
@@ -115,6 +117,11 @@ async function addStudentToResults(studentID) {
     search_box.value = "";
     search_table_body.replaceChildren();
     document.getElementById("search_box").focus();
+}
+
+async function addStudentToResults(studentID) {
+    resultID = await serverAddResult(studentID);
+    addResultElement(studentID, resultID);
 }
 
 async function deleteButton() {

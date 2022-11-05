@@ -29,39 +29,11 @@
     <script src="/static/edit_competition.js"></script>
     <script>
         {% for result in results %}
-            let row = document.createElement("tr");
-
-            let name = document.createElement("td");
-            name.textContent = formatName(
-                studentDB[{{ result.student_id|tojson|safe }}].name,
-                studentDB[{{ result.student_id|tojson|safe }}].preferred_name
+            addResultElement(
+                {{ result.student_id|tojson|safe }},
+                {{ result.id|tojson|safe }},
+                {{ result.score|tojson|safe }},
             );
-            row.appendChild(name);
-
-            let score_cell = document.createElement("td");
-
-            let score_input = document.createElement("input");
-            score_input.value = {{ result.score|tojson|safe }};
-            score_input.classList.add("score_input");
-            score_input.dataset.studentID = {{ result.student_id|tojson|safe }};
-            score_input.dataset.resultID = {{ result.id|tojson|safe }};
-            score_cell.appendChild(score_input);
-
-            row.appendChild(score_cell);
-
-            let remove_cell = document.createElement("td");
-            let remove_button = document.createElement("button");
-            remove_button.addEventListener("click", deleteButton);
-            remove_button.textContent = "-";
-            remove_cell.appendChild(remove_button);
-
-            row.appendChild(remove_cell);
-
-            document.getElementById("table_body").appendChild(row);
-
-            search_box.value = "";
-            search_table_body.replaceChildren();
-            document.getElementById("search_box").focus();
         {% endfor %}
     </script>
 {% endblock %}
