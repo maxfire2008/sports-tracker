@@ -5,7 +5,7 @@
         <thead>
             <tr>
                 <th>
-                    <input type="Text" id="search_box">
+                    <input type="Text" id="searchBox">
                 </th>
             </tr>
         </thead>
@@ -22,6 +22,7 @@
         <tbody id="table_body">
         </tbody>
     </table>
+    <button id="saveButton">Save</button>
     <script>const studentDB = {{ student_db|tojson|safe }};</script>
     <script>const competitionID = {{ competition_id|tojson|safe }}</script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>

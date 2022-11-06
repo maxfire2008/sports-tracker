@@ -43,20 +43,20 @@ function formatName(realName, preferredName) {
 }
 
 function filterOutExisting(search_results) {
-    let JSONResults = toJSON();
+    /*let JSONResults = toJSON();
     let filtered = [];
     for (result of search_results) {
         if (!JSONResults.some((e) => e.student_id === result["item"]["id"])) {
             filtered.push(result);
         }
     }
-    return filtered;
-    // return search_results;
+    return filtered;*/
+    return search_results;
 }
 
 function updateSearchHTML() {
-    let search = document.getElementById("search_box").value;
-    search_table_body.replaceChildren();
+    let search = document.getElementById("searchBox").value;
+    document.getElementById("search_table_body").replaceChildren();
     let search_results = filterOutExisting(searchStudentDB(search));
     if (search_results < 1 && search !== "") {
         let row = document.createElement("tr");
@@ -83,7 +83,7 @@ function updateSearchHTML() {
     }
 }
 
-function addResultElement(studentID, resultID, score=null) {
+function addResultElement(studentID, resultID, score = null) {
     let row = document.createElement("tr");
 
     let name = document.createElement("td");
@@ -114,9 +114,9 @@ function addResultElement(studentID, resultID, score=null) {
 
     document.getElementById("table_body").appendChild(row);
 
-    search_box.value = "";
-    search_table_body.replaceChildren();
-    document.getElementById("search_box").focus();
+    document.getElementById("searchBox").value = "";
+    document.getElementById("search_table_body").replaceChildren();
+    document.getElementById("searchBox").focus();
 }
 
 async function addStudentToResults(studentID) {
@@ -185,9 +185,9 @@ async function serverDeleteResult(resultID) {
     return response.status;
 }
 
-async function save() {
+async function serverSaveCompetition() {
     let response = await fetch("/save_competition/" + competitionID, {
-        method: "POST",
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
         },
@@ -198,12 +198,12 @@ async function save() {
 }
 
 document
-    .getElementById("search_box")
+    .getElementById("searchBox")
     .addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
             event.preventDefault();
             let search_results = filterOutExisting(
-                searchStudentDB(document.getElementById("search_box").value)
+                searchStudentDB(document.getElementById("searchBox").value)
             );
             if (search_results < 1) {
                 alert("No match!");
@@ -214,9 +214,13 @@ document
     });
 
 document
-    .getElementById("search_box")
+    .getElementById("searchBox")
     .addEventListener("input", updateSearchHTML);
 
+document
+    .getElementById("saveButton")
+    .addEventListener("click", serverSaveCompetition);
+
 window.addEventListener("load", function () {
-    search_box.value = "";
+    document.getElementById("searchBox").value = "";
 });

@@ -7,7 +7,7 @@ import sqlalchemy
 db = flask_sqlalchemy.SQLAlchemy()
 
 app = flask.Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@127.0.0.1:5431"
 db.init_app(app)
 
 
@@ -22,18 +22,18 @@ class Competition(db.Model):
 
 
 class Result(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    competition_id = db.Column(db.Integer, db.ForeignKey(Competition.id))
+    # competition = db.relationship("Competition", backref=db.backref("competition", uselist=False))
+    student_id = db.Column(db.String)
+    score = db.Column(db.String)
     __table_args__ = (
         db.UniqueConstraint(
-            "competition_id",
-            "student_id",
+            competition_id,
+            student_id,
             name="student_unique_in_competition"
         ),
     )
-    id = db.Column(db.Integer, primary_key=True)
-    competition_id = db.Column(db.Integer, db.ForeignKey(Competition.id))
-    student_id = db.Column(db.String)  # , db.ForeignKey('competitions.id'))
-    #student = db.relationship("Student", backref=backref("competitions", uselist=False))
-    score = db.Column(db.String)
 
 
 with app.app_context():
@@ -58,13 +58,22 @@ def edit_competition(competition_id):
     )
 
 
-@app.route("/save_competition/<competition_id>", methods=["POST"])
+@app.route("/save_competition/<competition_id>", methods=["PUT"])
 def save_competition(competition_id):
     # urllib.parse.urlparse("http://127.0.0.1:5000/edit_competition/500m_8_boys.yaml").path.split("/")[-1]
     results = flask.request.get_json()
 
     for result in results:
         print(result)
+        DBResult = Result.query.filter_by(
+            id=result["id"],
+            competition_id=competition_id,
+        ).first()
+        if result["student_id"] != None:
+            DBResult.student_id = result["student_id"]
+        if result["score"] != None:
+            DBResult.score = result["score"]
+    db.session.commit()
 
     return "200 OK", 200
 
