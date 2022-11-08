@@ -2,7 +2,9 @@ import time
 import flask
 import yaml
 import flask_sqlalchemy
-import sqlalchemy
+import flask_wtf
+import wtforms
+import wtforms.validators
 
 db = flask_sqlalchemy.SQLAlchemy()
 
@@ -14,8 +16,7 @@ db.init_app(app)
 class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    competition_type = db.Column(db.String)
-    distance = db.Column(db.String)
+    scoring_type = db.Column(db.String)
     gender = db.Column(db.String)
     ystart = db.Column(db.Integer)
     start_time = db.Column(db.DateTime)
@@ -45,6 +46,57 @@ def index():
     return flask.render_template("index.html")
 
 
+class CreateCompetitionForm(flask_wtf.FlaskForm):
+    name = wtforms.StringField(
+        'name',
+        validators=[
+            wtforms.validators.DataRequired()
+        ]
+    )
+    scoring_type = wtforms.StringField(
+        'scoring_type',
+        validators=[
+            wtforms.validators.DataRequired(),
+            wtforms.validators.AnyOf(
+                [
+                    "shortest_time",
+                    "highest_score"
+                ]
+            )
+        ]
+    )
+    gender = wtforms.StringField(
+        'gender',
+        validators=[
+            wtforms.validators.AnyOf(
+                [
+                    "male",
+                    "female",
+                    "any"
+                ]
+            )
+        ]
+    )
+    ystart = wtforms.IntegerField(
+        'ystart'
+    )
+    start_time = wtforms.DateTimeField(
+        'start_time'
+    )
+
+
+@app.route("/create_competition/", methods=["GET"]):
+def create_competition():
+    return flask.render_template(
+        "create_competition.html",
+
+    )
+
+
+@app.route("/api/create_competition/", methods=["POST"])
+def api_create_competition():
+    return "501 Not Implemented", 501
+
 @app.route("/edit_competition/<competition_id>")
 def edit_competition(competition_id):
     results = Result.query.filter_by(competition_id=competition_id).all()
@@ -58,8 +110,8 @@ def edit_competition(competition_id):
     )
 
 
-@app.route("/save_competition/<competition_id>", methods=["PUT"])
-def save_competition(competition_id):
+@app.route("/api/save_competition/<competition_id>", methods=["PUT"])
+def api_save_competition(competition_id):
     # urllib.parse.urlparse("http://127.0.0.1:5000/edit_competition/500m_8_boys.yaml").path.split("/")[-1]
     results = flask.request.get_json()
 
@@ -78,8 +130,8 @@ def save_competition(competition_id):
     return "200 OK", 200
 
 
-@app.route("/add_result/<competition_id>", methods=["POST"])
-def add_result(competition_id):
+@app.route("/api/add_result/<competition_id>", methods=["POST"])
+def api_add_result(competition_id):
     data = flask.request.get_json()
     result = Result(
         competition_id=competition_id,
@@ -90,8 +142,8 @@ def add_result(competition_id):
     return str(result.id), 200
 
 
-@app.route("/delete_result/<result_id>", methods=["DELETE"])
-def delete_result(result_id):
+@app.route("/api/delete_result/<result_id>", methods=["DELETE"])
+def api_delete_result(result_id):
     # return "200 OK", 200
     Result.query.filter_by(id=result_id).delete()
     db.session.commit()

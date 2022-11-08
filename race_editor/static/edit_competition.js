@@ -120,7 +120,7 @@ function addResultElement(studentID, resultID, score = null) {
 }
 
 async function addStudentToResults(studentID) {
-    resultID = await serverAddResult(studentID);
+    resultID = await apiAddResult(studentID);
     addResultElement(studentID, resultID);
 }
 
@@ -129,7 +129,7 @@ async function deleteButton() {
         this.parentElement.parentElement.getElementsByClassName(
             "score_input"
         )[0].dataset.resultID;
-    let delete_request_status = await serverDeleteResult(result_id);
+    let delete_request_status = await apiDeleteResult(result_id);
     if (delete_request_status === 200) {
         this.parentElement.parentElement.remove();
     } else {
@@ -154,8 +154,8 @@ function toJSON() {
     return scores;
 }
 
-async function serverAddResult(studentID) {
-    let response = await fetch("/add_result/" + competitionID, {
+async function apiAddResult(studentID) {
+    let response = await fetch("/api/add_result/" + competitionID, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -178,15 +178,15 @@ async function serverAddResult(studentID) {
     return body;
 }
 
-async function serverDeleteResult(resultID) {
-    let response = await fetch("/delete_result/" + resultID, {
+async function apiDeleteResult(resultID) {
+    let response = await fetch("/api/delete_result/" + resultID, {
         method: "DELETE",
     });
     return response.status;
 }
 
-async function serverSaveCompetition() {
-    let response = await fetch("/save_competition/" + competitionID, {
+async function apiSaveCompetition() {
+    let response = await fetch("/api/save_competition/" + competitionID, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -219,7 +219,7 @@ document
 
 document
     .getElementById("saveButton")
-    .addEventListener("click", serverSaveCompetition);
+    .addEventListener("click", apiSaveCompetition);
 
 window.addEventListener("load", function () {
     document.getElementById("searchBox").value = "";
