@@ -64,6 +64,10 @@ def form_create_competition():
         flask.flash("Name is a required field")
         return "400 Bad Request", 400
     scored = flask.request.form.get("scored", False)
+    if scored.lower() in ["true", "checked", "on"]:
+        scored = True
+    else:
+        scored = False
     sorting_type = flask.request.form.get("sorting_type", None)
     if sorting_type not in ["lowest_time"]:
         flask.flash("Scoring Type is invalid")

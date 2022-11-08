@@ -239,6 +239,7 @@ async function apiSaveCompetition() {
     });
     let body = await response.text();
     console.log(body);
+    window.location.refresh();
 }
 
 document
