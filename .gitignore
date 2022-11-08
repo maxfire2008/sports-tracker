@@ -1,4 +1,4 @@
-/race_editor/static/libraries/
 **/__pycache__/**
 .idea
 race_editor/instance/project.db
+race_editor/CONFIG.py

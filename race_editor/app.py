@@ -2,11 +2,13 @@ import time
 import flask
 import yaml
 import flask_sqlalchemy
+import CONFIG
 
 db = flask_sqlalchemy.SQLAlchemy()
 
 app = flask.Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@127.0.0.1:5431"
+app.config["SECRET_KEY"] = CONFIG.SECRET_KEY
 db.init_app(app)
 
 
@@ -18,12 +20,13 @@ class Event(db.Model):
 class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    scoring_type = db.Column(db.String)
-    gender = db.Column(db.String)
-    ystart = db.Column(db.Integer)
-    start_time = db.Column(db.DateTime)
-    event_id = db.Column(db.Integer, db.ForeignKey(Event.id))
-    archived = db.Column(db.Boolean)
+    scored = db.Column(db.Boolean)
+    sorting_type = db.Column(db.String)#select of short_time long_time etc
+    gender = db.Column(db.String)# male female all
+    ystart = db.Column(db.Integer)# year
+    start_time = db.Column(db.DateTime)# date and time
+    event_id = db.Column(db.Integer, db.ForeignKey(Event.id))# auto populated just make a input for now
+    archived = db.Column(db.Boolean) # not in form
 
 
 class Result(db.Model):
@@ -41,7 +44,10 @@ with app.app_context():
 
 @app.route("/")
 def index():
-    return flask.render_template("index.html")
+    return flask.render_template(
+        "index.html",
+        cookies=flask.request.cookies
+    )
 
 
 @app.route("/create_competition/")
@@ -53,6 +59,19 @@ def create_competition():
 
 @app.route("/form/create_competition/", methods=["POST"])
 def form_create_competition():
+    name = flask.request.form.get("name", None)
+    if not name:
+        flask.flash("Name is a required field")
+        return "400 Bad Request", 400
+    scored = flask.request.form.get("scored", False)
+    sorting_type = flask.request.form.get("sorting_type", None)
+    if sorting_type not in ["lowest_time"]:
+        flask.flash("Scoring Type is invalid")
+    gender = None
+    ystart = None
+    start_time = None
+    event_id = None
+    archived = None
     return "501 Not Implemented", 501
 
 
@@ -113,6 +132,7 @@ def api_archive_result(result_id):
     result.archived = True
     db.session.commit()
     return "200 OK", 200
+
 
 @app.route("/api/delete_result/<result_id>", methods=["DELETE"])
 def api_delete_result(result_id):

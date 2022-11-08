@@ -9,12 +9,15 @@
             <li>
                 <a href="/list_competitions/">List competitions</a>
             </li>
-            <li>
-                <button onclick="Cookies.set('show_archived', 1);">Show Archived</button>
-            </li>
-            <li>
-                <button onclick="Cookies.set('show_archived', 0);">Hide Archived</button>
-            </li>
+            {% if cookies.get("show_archived") != "1" %}
+                <li>
+                    <button onclick="Cookies.set('show_archived', 1);window.location.reload();">Show Archived</button>
+                </li>
+            {% else %}
+                <li>
+                    <button onclick="Cookies.set('show_archived', 0);window.location.reload();">Hide Archived</button>
+                </li>
+            {% endif %}
         </ul>
     </p>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
