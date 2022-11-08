@@ -83,7 +83,7 @@ function updateSearchHTML() {
     }
 }
 
-function addResultElement(studentID, resultID, score = null) {
+function addResultElement(studentID, resultID, score = null, archived = false) {
     let row = document.createElement("tr");
 
     let name = document.createElement("td");
@@ -106,8 +106,15 @@ function addResultElement(studentID, resultID, score = null) {
 
     let remove_cell = document.createElement("td");
     let remove_button = document.createElement("button");
-    remove_button.addEventListener("click", deleteButton);
-    remove_button.textContent = "-";
+    if (archived === true) {
+        row.style.backgroundColor = "lawngreen";
+        remove_button.textContent = "🗑️";
+        remove_button.addEventListener("click", deleteButton);
+    } else {
+        remove_button.addEventListener("click", archiveButton);
+        remove_button.textContent = "-";
+    }
+    remove_button.classList.add("remove_button");
     remove_cell.appendChild(remove_button);
 
     row.appendChild(remove_cell);
@@ -122,6 +129,36 @@ function addResultElement(studentID, resultID, score = null) {
 async function addStudentToResults(studentID) {
     resultID = await apiAddResult(studentID);
     addResultElement(studentID, resultID);
+}
+
+async function archiveButton() {
+    let result_id =
+        this.parentElement.parentElement.getElementsByClassName(
+            "score_input"
+        )[0].dataset.resultID;
+    let archival_request_status = await apiArchiveResult(result_id);
+    if (archival_request_status === 200) {
+        if (Cookies.get("show_archived") === "1") {
+            this.parentElement.parentElement.style.backgroundColor =
+                "lawngreen";
+            this.parentElement.parentElement
+                .getElementsByClassName("remove_button")[0]
+                .removeEventListener("click", deleteButton);
+
+            cantDeleteYetP = document.createElement("span");
+            cantDeleteYetP.textContent = "Can't delete yet";
+            this.parentElement.parentElement.getElementsByClassName(
+                "remove_button"
+            )[0].outerHTML = cantDeleteYetP.outerHTML;
+        } else {
+            this.parentElement.parentElement.remove();
+        }
+    } else {
+        alert(
+            "Error in archival. Inform support of the error code " +
+                archival_request_status
+        );
+    }
 }
 
 async function deleteButton() {
@@ -176,6 +213,13 @@ async function apiAddResult(studentID) {
     let body = await response.text();
     console.log(body);
     return body;
+}
+
+async function apiArchiveResult(resultID) {
+    let response = await fetch("/api/archive_result/" + resultID, {
+        method: "PATCH",
+    });
+    return response.status;
 }
 
 async function apiDeleteResult(resultID) {

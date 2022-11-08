@@ -9,6 +9,7 @@ app = flask.Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@127.0.0.1:5431"
 db.init_app(app)
 
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -27,7 +28,7 @@ class Competition(db.Model):
 
 class Result(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    competition_id = db.Column(db.Integer)#, db.ForeignKey(Competition.id))
+    competition_id = db.Column(db.Integer)  # , db.ForeignKey(Competition.id))
     # competition = db.relationship("Competition", backref=db.backref("competition", uselist=False))
     student_id = db.Column(db.String)
     score = db.Column(db.String)
@@ -54,9 +55,14 @@ def create_competition():
 def form_create_competition():
     return "501 Not Implemented", 501
 
+
 @app.route("/edit_competition/<competition_id>")
 def edit_competition(competition_id):
-    results = Result.query.filter_by(competition_id=competition_id, archived=False).all()
+    show_archived = flask.request.cookies.get('show_archived', 0)
+    results = Result.query.filter(
+        Result.competition_id == competition_id,
+        show_archived == "1" or Result.archived != True
+    ).all()
     return flask.render_template(
         "edit_competition.html",
         competition_id=competition_id,
@@ -74,9 +80,9 @@ def api_save_competition(competition_id):
 
     for result in results:
         print(result)
-        DBResult = Result.query.filter_by(
-            id=result["id"],
-            competition_id=competition_id,
+        DBResult = Result.query.filter(
+            Result.id == result["id"],
+            Result.competition_id == competition_id,
         ).first()
         if result["student_id"] != None:
             DBResult.student_id = result["student_id"]
@@ -92,17 +98,25 @@ def api_add_result(competition_id):
     data = flask.request.get_json()
     result = Result(
         competition_id=competition_id,
-        student_id=data["student_id"]
+        student_id=data["student_id"],
+        archived=False
     )
     db.session.add(result)
     db.session.commit()
     return str(result.id), 200
 
 
+@app.route("/api/archive_result/<result_id>", methods=["PATCH"])
+def api_archive_result(result_id):
+    # return "200 OK", 200
+    result = Result.query.filter(Result.id == result_id).first()
+    result.archived = True
+    db.session.commit()
+    return "200 OK", 200
+
 @app.route("/api/delete_result/<result_id>", methods=["DELETE"])
 def api_delete_result(result_id):
     # return "200 OK", 200
-    result = Result.query.filter_by(id=result_id).first()
-    result.archived = True
+    Result.query.filter_by(id=result_id).delete()
     db.session.commit()
     return "200 OK", 200

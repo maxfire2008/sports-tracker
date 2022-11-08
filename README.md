@@ -10,6 +10,11 @@ Track sports carnivals!
 * :question: MySQL
   * unknown
 
+## To-do
+* [ ] implement competitions
+* [ ] Add restore button to archived items
+* [ ] implement events
+
 ## Planning
 ### `results` table
 | id PK | race_id FK | student_id | score |

@@ -9,6 +9,14 @@
             <li>
                 <a href="/list_competitions/">List competitions</a>
             </li>
+            <li>
+                <button onclick="Cookies.set('show_archived', 1);">Show Archived</button>
+            </li>
+            <li>
+                <button onclick="Cookies.set('show_archived', 0);">Hide Archived</button>
+            </li>
         </ul>
     </p>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
 {% endblock %}
