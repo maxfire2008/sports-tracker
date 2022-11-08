@@ -32,13 +32,6 @@ class Result(db.Model):
     student_id = db.Column(db.String)
     score = db.Column(db.String)
     archived = db.Column(db.Boolean)
-    __table_args__ = (
-        db.UniqueConstraint(
-            competition_id,
-            student_id,
-            name="student_unique_in_competition"
-        ),
-    )
 
 
 with app.app_context():
