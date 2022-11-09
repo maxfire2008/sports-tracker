@@ -1,0 +1,26 @@
+.student-name-cell, .column-name {
+    width: 60vw;
+}
+.column-score, .score-cell {
+    width: 20vw;
+}
+.column-delete, .remove-cell {
+    min-width: 5vw;
+}
+
+.archived {
+    background-color: lawngreen;
+}
+
+.search-box-th {
+    width: 100%;
+}
+
+input {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.remove-button {
+    width: 5vw;
+}

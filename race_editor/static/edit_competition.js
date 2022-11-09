@@ -88,6 +88,7 @@ function addResultElement(
     resultID,
     score = null,
     archived = false,
+    allow_delete = true,
     return_row = false
 ) {
     let row = document.createElement("tr");
@@ -97,9 +98,11 @@ function addResultElement(
         studentDB[studentID].name,
         studentDB[studentID].preferred_name
     );
+    name.classList.add("student-name-cell");
     row.appendChild(name);
 
     let score_cell = document.createElement("td");
+    score_cell.classList.add("score-cell");
 
     let score_input = document.createElement("input");
     score_input.value = score;
@@ -111,18 +114,29 @@ function addResultElement(
     row.appendChild(score_cell);
 
     let remove_cell = document.createElement("td");
-    let remove_button = document.createElement("button");
-    if (archived === true) {
-        row.style.backgroundColor = "lawngreen";
-        remove_button.textContent = "🗑️";
-        remove_button.addEventListener("click", deleteButton);
-    } else {
-        remove_button.addEventListener("click", archiveButton);
-        remove_button.textContent = "-";
+    if (allow_delete === true) {
+        remove_cell.classList.add("remove-cell");
+        let remove_button = document.createElement("button");
+        if (archived === true) {
+            remove_button.textContent = "🗑️";
+            remove_button.addEventListener("click", deleteButton);
+        } else {
+            remove_button.textContent = "🗃️";
+            remove_button.addEventListener("click", archiveButton);
+        }
+        remove_button.classList.add("remove-button");
+        remove_cell.appendChild(remove_button);
     }
-    remove_button.classList.add("remove_button");
-    remove_cell.appendChild(remove_button);
 
+    if (archived === true) {
+        let restore_button = document.createElement("button");
+        restore_button.textContent = "♻️";
+        restore_button.addEventListener("click", restoreButton);
+
+        restore_button.classList.add("restore-button");
+        remove_cell.appendChild(restore_button);
+        row.classList.add("archived");
+    }
     row.appendChild(remove_cell);
 
     if (return_row) {
@@ -141,6 +155,21 @@ async function addStudentToResults(studentID) {
     addResultElement(studentID, resultID);
 }
 
+function replaceElement(a, b) {
+    if (a.previousElementSibling) {
+        a.previousElementSibling.insertAdjacentElement(
+            "afterend",
+            b
+        );
+    } else {
+        a.parentElement.insertAdjacentElement(
+            "afterbegin",
+            b
+        );
+    }
+    a.remove();
+}
+
 async function archiveButton() {
     let score_input =
         this.parentElement.parentElement.getElementsByClassName(
@@ -150,8 +179,15 @@ async function archiveButton() {
     let student_id = score_input.dataset.studentID;
     let archival_request_status = await apiArchiveResult(result_id);
     if (archival_request_status === 200) {
-        row = addResultElement(student_id, result_id, score_input.value, true, true);
-        this.parentElement.parentElement.outerHTML = row.outerHTML;
+        row = addResultElement(
+            student_id,
+            result_id,
+            score_input.value,
+            true,
+            false,
+            true
+        );
+        replaceElement(this.parentElement.parentElement, row);
     } else {
         alert(
             "Error in archival. Inform support of the error code " +
@@ -160,19 +196,47 @@ async function archiveButton() {
     }
 }
 
-async function deleteButton() {
-    let result_id =
+async function restoreButton() {
+    let score_input =
         this.parentElement.parentElement.getElementsByClassName(
             "score_input"
-        )[0].dataset.resultID;
-    let delete_request_status = await apiDeleteResult(result_id);
-    if (delete_request_status === 200) {
-        this.parentElement.parentElement.remove();
+        )[0];
+    let result_id = score_input.dataset.resultID;
+    let student_id = score_input.dataset.studentID;
+    let restore_request_status = await apiRestoreResult(result_id);
+    if (restore_request_status === 200) {
+        row = addResultElement(
+            student_id,
+            result_id,
+            score_input.value,
+            false,
+            true,
+            true
+        );
+        replaceElement(this.parentElement.parentElement, row);
     } else {
         alert(
-            "Error in deletion. Inform support of the error code " +
-                delete_request_status
+            "Error in restore. Inform support of the error code " +
+                restore_request_status
         );
+    }
+}
+
+async function deleteButton() {
+    if (confirm("Are you sure you want to delete?")) {
+        let result_id =
+            this.parentElement.parentElement.getElementsByClassName(
+                "score_input"
+            )[0].dataset.resultID;
+        let delete_request_status = await apiDeleteResult(result_id);
+        if (delete_request_status === 200) {
+            this.parentElement.parentElement.remove();
+        } else {
+            alert(
+                "Error in deletion. Inform support of the error code " +
+                    delete_request_status
+            );
+        }
     }
 }
 
@@ -216,6 +280,13 @@ async function apiAddResult(studentID) {
 
 async function apiArchiveResult(resultID) {
     let response = await fetch("/api/archive_result/" + resultID, {
+        method: "PATCH",
+    });
+    return response.status;
+}
+
+async function apiRestoreResult(resultID) {
+    let response = await fetch("/api/restore_result/" + resultID, {
         method: "PATCH",
     });
     return response.status;

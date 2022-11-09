@@ -223,6 +223,14 @@ def api_archive_result(result_id):
     db.session.commit()
     return "200 OK", 200
 
+@app.route("/api/restore_result/<result_id>", methods=["PATCH"])
+def api_restore_result(result_id):
+    # return "200 OK", 200
+    result = Result.query.filter(Result.id == result_id).first()
+    result.archived = False
+    db.session.commit()
+    return "200 OK", 200
+
 
 @app.route("/api/delete_result/<result_id>", methods=["DELETE"])
 def api_delete_result(result_id):
