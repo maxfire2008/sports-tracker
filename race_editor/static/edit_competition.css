@@ -21,6 +21,7 @@ input {
     width: 100%;
 }
 
-.remove-button {
-    width: 5vw;
+.remove-button, .archive-button, .restore-button {
+    min-width: 5vw;
+    max-width: 50%;
 }

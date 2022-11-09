@@ -131,11 +131,12 @@ function addResultElement(
         if (archived === true) {
             remove_button.textContent = "🗑️";
             remove_button.addEventListener("click", deleteButton);
+            remove_button.classList.add("remove-button");
         } else {
             remove_button.textContent = "🗃️";
             remove_button.addEventListener("click", archiveButton);
+            remove_button.classList.add("archive-button");
         }
-        remove_button.classList.add("remove-button");
         remove_cell.appendChild(remove_button);
     }
 
@@ -164,7 +165,7 @@ function replaceElement(a, b) {
         try {
             a.parentElement.insertAdjacentElement("afterbegin", b);
         } catch (TypeError) {
-            confirm("Whoah! Slow down");
+            confirm("Whoah! Slow down.");
         }
     }
     a.remove();
