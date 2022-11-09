@@ -114,6 +114,17 @@ function addResultElement(
     row.appendChild(score_cell);
 
     let remove_cell = document.createElement("td");
+
+    if (archived === true) {
+        let restore_button = document.createElement("button");
+        restore_button.textContent = "♻️";
+        restore_button.addEventListener("click", restoreButton);
+
+        restore_button.classList.add("restore-button");
+        remove_cell.appendChild(restore_button);
+        row.classList.add("archived");
+    }
+
     if (allow_delete === true) {
         remove_cell.classList.add("remove-cell");
         let remove_button = document.createElement("button");
@@ -128,15 +139,6 @@ function addResultElement(
         remove_cell.appendChild(remove_button);
     }
 
-    if (archived === true) {
-        let restore_button = document.createElement("button");
-        restore_button.textContent = "♻️";
-        restore_button.addEventListener("click", restoreButton);
-
-        restore_button.classList.add("restore-button");
-        remove_cell.appendChild(restore_button);
-        row.classList.add("archived");
-    }
     row.appendChild(remove_cell);
 
     if (return_row) {
@@ -157,15 +159,13 @@ async function addStudentToResults(studentID) {
 
 function replaceElement(a, b) {
     if (a.previousElementSibling) {
-        a.previousElementSibling.insertAdjacentElement(
-            "afterend",
-            b
-        );
+        a.previousElementSibling.insertAdjacentElement("afterend", b);
     } else {
-        a.parentElement.insertAdjacentElement(
-            "afterbegin",
-            b
-        );
+        try {
+            a.parentElement.insertAdjacentElement("afterbegin", b);
+        } catch (TypeError) {
+            confirm("Whoah! Slow down");
+        }
     }
     a.remove();
 }
