@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>Viewing {{ event.name }}</h1>
+    <p>
+        <ul>
+            <li>
+                <a href="/event/{{ event.id }}/create_competition/">Create competition</a>
+            </li>
+        </ul>
+    </p>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
+{% endblock %}

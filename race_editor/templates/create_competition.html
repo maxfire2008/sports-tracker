@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block body %}
     <h1>Creating a competition</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
     <form method="POST" action="/form/create_competition/">
         <div>
             <label for="name">Competition Name</label>
@@ -13,20 +24,36 @@
         <div>
             <label for="sorting_type">Sorting Type</label>
             <select name="sorting_type" id="sorting_type">
-                <option value="short_time">Shortest Time</option>
+                <option value="short_time">
+                    Shortest Time
+                </option>
             </select>
         </div>
         <div>
             <label for="gender">Gender</label>
             <select name="gender" id="gender">
-                <option value="all">All</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+                <option value="all">
+                    All
+                </option>
+                <option value="male">
+                    Male
+                </option>
+                <option value="female">
+                    Female
+                </option>
             </select>
         </div>
         <div>
             <label for="ystart">YStart</label>
             <input type="number" name="ystart" id="ystart" value=2015>
+        </div>
+        <div>
+            <label for="start_time">Start Time</label>
+            <input type="datetime-local" name="start_time">
+        </div>
+        <div>
+            <label for="event_id">Event (HIDE ME LATER)</label>
+            <input name="event_id" value="{{ event_id }}">
         </div>
         <div>
             <input type="submit" />

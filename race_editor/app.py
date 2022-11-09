@@ -1,3 +1,4 @@
+import datetime
 import time
 import flask
 import yaml
@@ -21,12 +22,13 @@ class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     scored = db.Column(db.Boolean)
-    sorting_type = db.Column(db.String)#select of short_time long_time etc
-    gender = db.Column(db.String)# male female all
-    ystart = db.Column(db.Integer)# year
-    start_time = db.Column(db.DateTime)# date and time
-    event_id = db.Column(db.Integer, db.ForeignKey(Event.id))# auto populated just make a input for now
-    archived = db.Column(db.Boolean) # not in form
+    sorting_type = db.Column(db.String)  # select of short_time long_time etc
+    gender = db.Column(db.String)  # male female all
+    ystart = db.Column(db.Integer)  # year
+    start_time = db.Column(db.DateTime)  # date and time
+    # auto populated just make a input for now
+    event_id = db.Column(db.Integer, db.ForeignKey(Event.id))
+    archived = db.Column(db.Boolean)  # not in form
 
 
 class Result(db.Model):
@@ -50,10 +52,48 @@ def index():
     )
 
 
-@app.route("/create_competition/")
-def create_competition():
+@app.route("/create_event/")
+def create_event():
     return flask.render_template(
-        "create_competition.html"
+        "create_event.html"
+    )
+
+
+@app.route("/form/create_event/", methods=["POST"])
+def form_create_event():
+    name = flask.request.form.get("name", None)
+    if not name:
+        flask.flash("Name is a required field")
+        return flask.redirect(flask.request.referrer)
+    event = Event(
+        name=name
+    )
+    db.session.add(event)
+    db.session.commit()
+    return flask.redirect(
+        flask.url_for(
+            view_event,
+            event_id=event.id
+        )
+    )
+
+
+@app.route("/event/<event_id>/")
+def view_event(event_id):
+    event = Event.query.filter(Event.id == event_id).first()
+    if event:
+        return flask.render_template(
+            "view_event.html",
+            event=event
+        )
+    return "404 Event Not Found", 404
+
+
+@app.route("/event/<event_id>/create_competition/")
+def create_competition(event_id):
+    return flask.render_template(
+        "create_competition.html",
+        event_id=event_id
     )
 
 
@@ -62,25 +102,53 @@ def form_create_competition():
     name = flask.request.form.get("name", None)
     if not name:
         flask.flash("Name is a required field")
-        return "400 Bad Request", 400
+        return flask.redirect(flask.request.referrer)
     scored = flask.request.form.get("scored", False)
-    if scored.lower() in ["true", "checked", "on"]:
+    if str(scored).lower() in ["true", "checked", "on"]:
         scored = True
     else:
         scored = False
     sorting_type = flask.request.form.get("sorting_type", None)
-    if sorting_type not in ["lowest_time"]:
-        flask.flash("Scoring Type is invalid")
-    gender = None
-    ystart = None
-    start_time = None
-    event_id = None
-    archived = None
-    return "501 Not Implemented", 501
+    if sorting_type not in ["short_time"]:
+        flask.flash("Scoring type is invalid")
+        return flask.redirect(flask.request.referrer)
+    gender = flask.request.form.get("gender", "all")
+    if gender not in ["male", "female"]:
+        gender = "all"
+    try:
+        ystart = int(flask.request.form.get("ystart", "-1"))
+    except ValueError:
+        ystart = None
+    try:
+        start_time = datetime.datetime.fromisoformat(
+            flask.request.form.get("start_time", None)
+        )
+    except ValueError:
+        start_time = None
+    try:
+        event_id = int(flask.request.form.get("event_id", None))
+    except (TypeError, ValueError):
+        flask.flash("What have you done")
+        return flask.redirect(flask.request.referrer)
+
+    competition = Competition(
+        name=name,
+        scored=scored,
+        sorting_type=sorting_type,
+        gender=gender,
+        ystart=ystart,
+        start_time=start_time,
+        event_id=event_id,
+    )
+
+    db.session.add(competition)
+    db.session.commit()
+
+    return "200 OK", 501
 
 
-@app.route("/edit_competition/<competition_id>")
-def edit_competition(competition_id):
+@app.route("/competition/<competition_id>/edit")
+def competition_edit(competition_id):
     show_archived = flask.request.cookies.get('show_archived', 0)
     results = Result.query.filter(
         Result.competition_id == competition_id,
@@ -141,6 +209,6 @@ def api_archive_result(result_id):
 @app.route("/api/delete_result/<result_id>", methods=["DELETE"])
 def api_delete_result(result_id):
     # return "200 OK", 200
-    Result.query.filter_by(id=result_id).delete()
+    Result.query.filter(id == result_id).delete()
     db.session.commit()
     return "200 OK", 200

@@ -12,6 +12,9 @@ Track sports carnivals!
 
 ## To-do
 * [ ] implement competitions
+  * [ ] Creation
+  * [ ] Edit
+  * etc
 * [ ] Add restore button to archived items
 * [ ] implement events
 
