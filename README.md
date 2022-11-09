@@ -11,12 +11,14 @@ Track sports carnivals!
   * unknown
 
 ## To-do
+* [ ] list all competitions in event
 * [ ] implement competitions
-  * [ ] Creation
+  * [ ] Redirect to competition after creation
   * [ ] Edit
   * etc
 * [ ] Add restore button to archived items
 * [ ] implement events
+* [ ] Add participation points
 
 ## Planning
 ### `results` table

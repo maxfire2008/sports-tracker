@@ -10,6 +10,7 @@ db = flask_sqlalchemy.SQLAlchemy()
 app = flask.Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:postgres@127.0.0.1:5431"
 app.config["SECRET_KEY"] = CONFIG.SECRET_KEY
+app.url_map.strict_slashes = False
 db.init_app(app)
 
 
@@ -52,14 +53,14 @@ def index():
     )
 
 
-@app.route("/create_event/")
+@app.route("/create_event")
 def create_event():
     return flask.render_template(
         "create_event.html"
     )
 
 
-@app.route("/form/create_event/", methods=["POST"])
+@app.route("/form/create_event", methods=["POST"])
 def form_create_event():
     name = flask.request.form.get("name", None)
     if not name:
@@ -72,7 +73,7 @@ def form_create_event():
     db.session.commit()
     return flask.redirect(
         flask.url_for(
-            view_event,
+            "view_event",
             event_id=event.id
         )
     )
@@ -81,15 +82,17 @@ def form_create_event():
 @app.route("/event/<event_id>/")
 def view_event(event_id):
     event = Event.query.filter(Event.id == event_id).first()
+    competitions = Competition.query.filter(Competition.event_id == event_id).all()
     if event:
         return flask.render_template(
             "view_event.html",
-            event=event
+            event=event,
+            competitions=competitions,
         )
     return "404 Event Not Found", 404
 
 
-@app.route("/event/<event_id>/create_competition/")
+@app.route("/event/<event_id>/create_competition")
 def create_competition(event_id):
     return flask.render_template(
         "create_competition.html",
@@ -97,7 +100,7 @@ def create_competition(event_id):
     )
 
 
-@app.route("/form/create_competition/", methods=["POST"])
+@app.route("/form/create_competition", methods=["POST"])
 def form_create_competition():
     name = flask.request.form.get("name", None)
     if not name:
@@ -150,6 +153,7 @@ def form_create_competition():
 @app.route("/competition/<competition_id>/edit")
 def competition_edit(competition_id):
     show_archived = flask.request.cookies.get('show_archived', 0)
+    competition = Competition.query.filter(Competition.id == competition_id).first()
     results = Result.query.filter(
         Result.competition_id == competition_id,
         show_archived == "1" or Result.archived != True
@@ -157,6 +161,7 @@ def competition_edit(competition_id):
     return flask.render_template(
         "edit_competition.html",
         competition_id=competition_id,
+        competition=competition,
         student_db=yaml.safe_load(
             open("../reference/student_db.yaml")
         ),

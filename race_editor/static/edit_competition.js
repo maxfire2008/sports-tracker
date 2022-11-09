@@ -109,6 +109,8 @@ function addResultElement(studentID, resultID, score = null, archived = false) {
     if (archived === true) {
         row.style.backgroundColor = "lawngreen";
         remove_button.textContent = "🗑️";
+        this.parentElement.parentElement
+                .getElementsByClassName("score_input")[0];
         remove_button.addEventListener("click", deleteButton);
     } else {
         remove_button.addEventListener("click", archiveButton);
@@ -144,6 +146,9 @@ async function archiveButton() {
             this.parentElement.parentElement
                 .getElementsByClassName("remove_button")[0]
                 .removeEventListener("click", deleteButton);
+
+            this.parentElement.parentElement
+                .getElementsByClassName("score_input")[0].disabled = true;
 
             cantDeleteYetP = document.createElement("span");
             cantDeleteYetP.textContent = "Can't delete yet";
