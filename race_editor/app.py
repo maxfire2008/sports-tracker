@@ -4,6 +4,7 @@ import flask
 import yaml
 import flask_sqlalchemy
 import CONFIG
+import sorters
 
 db = flask_sqlalchemy.SQLAlchemy()
 
@@ -82,7 +83,8 @@ def form_create_event():
 @app.route("/event/<event_id>/")
 def view_event(event_id):
     event = Event.query.filter(Event.id == event_id).first()
-    competitions = Competition.query.filter(Competition.event_id == event_id).all()
+    competitions = Competition.query.filter(
+        Competition.event_id == event_id).all()
     if event:
         return flask.render_template(
             "view_event.html",
@@ -112,7 +114,7 @@ def form_create_competition():
     else:
         scored = False
     sorting_type = flask.request.form.get("sorting_type", None)
-    if sorting_type not in ["short_time"]:
+    if sorting_type not in sorters.sorters:
         flask.flash("Scoring type is invalid")
         return flask.redirect(flask.request.referrer)
     gender = flask.request.form.get("gender", "all")
@@ -153,11 +155,16 @@ def form_create_competition():
 @app.route("/competition/<competition_id>/edit")
 def competition_edit(competition_id):
     show_archived = flask.request.cookies.get('show_archived', 0)
-    competition = Competition.query.filter(Competition.id == competition_id).first()
+    competition = Competition.query.filter(
+        Competition.id == competition_id).first()
+
     results = Result.query.filter(
         Result.competition_id == competition_id,
         show_archived == "1" or Result.archived != True
     ).all()
+
+    score_parser = sorters.sorters[competition.sorting_type]
+
     return flask.render_template(
         "edit_competition.html",
         competition_id=competition_id,
@@ -165,7 +172,13 @@ def competition_edit(competition_id):
         student_db=yaml.safe_load(
             open("../reference/student_db.yaml")
         ),
-        results=results
+        results=sorted(
+            results,
+            key=lambda x:
+                score_parser.sorter(
+                    x.score, x.student_id
+                )
+        )
     )
 
 
@@ -214,6 +227,6 @@ def api_archive_result(result_id):
 @app.route("/api/delete_result/<result_id>", methods=["DELETE"])
 def api_delete_result(result_id):
     # return "200 OK", 200
-    Result.query.filter(id == result_id).delete()
+    Result.query.filter(Result.id == result_id).delete()
     db.session.commit()
     return "200 OK", 200

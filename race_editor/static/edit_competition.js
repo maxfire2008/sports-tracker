@@ -83,7 +83,13 @@ function updateSearchHTML() {
     }
 }
 
-function addResultElement(studentID, resultID, score = null, archived = false) {
+function addResultElement(
+    studentID,
+    resultID,
+    score = null,
+    archived = false,
+    return_row = false
+) {
     let row = document.createElement("tr");
 
     let name = document.createElement("td");
@@ -109,8 +115,6 @@ function addResultElement(studentID, resultID, score = null, archived = false) {
     if (archived === true) {
         row.style.backgroundColor = "lawngreen";
         remove_button.textContent = "🗑️";
-        this.parentElement.parentElement
-                .getElementsByClassName("score_input")[0];
         remove_button.addEventListener("click", deleteButton);
     } else {
         remove_button.addEventListener("click", archiveButton);
@@ -121,7 +125,11 @@ function addResultElement(studentID, resultID, score = null, archived = false) {
 
     row.appendChild(remove_cell);
 
-    document.getElementById("table_body").appendChild(row);
+    if (return_row) {
+        return row;
+    } else {
+        document.getElementById("table_body").appendChild(row);
+    }
 
     document.getElementById("searchBox").value = "";
     document.getElementById("search_table_body").replaceChildren();
@@ -134,30 +142,16 @@ async function addStudentToResults(studentID) {
 }
 
 async function archiveButton() {
-    let result_id =
+    let score_input =
         this.parentElement.parentElement.getElementsByClassName(
             "score_input"
-        )[0].dataset.resultID;
+        )[0];
+    let result_id = score_input.dataset.resultID;
+    let student_id = score_input.dataset.studentID;
     let archival_request_status = await apiArchiveResult(result_id);
     if (archival_request_status === 200) {
-        if (Cookies.get("show_archived") === "1") {
-            this.parentElement.parentElement.style.backgroundColor =
-                "lawngreen";
-            this.parentElement.parentElement
-                .getElementsByClassName("remove_button")[0]
-                .removeEventListener("click", deleteButton);
-
-            this.parentElement.parentElement
-                .getElementsByClassName("score_input")[0].disabled = true;
-
-            cantDeleteYetP = document.createElement("span");
-            cantDeleteYetP.textContent = "Can't delete yet";
-            this.parentElement.parentElement.getElementsByClassName(
-                "remove_button"
-            )[0].outerHTML = cantDeleteYetP.outerHTML;
-        } else {
-            this.parentElement.parentElement.remove();
-        }
+        row = addResultElement(student_id, result_id, score_input.value, true, true);
+        this.parentElement.parentElement.outerHTML = row.outerHTML;
     } else {
         alert(
             "Error in archival. Inform support of the error code " +
