@@ -2,27 +2,37 @@
 {% block body %}
     <h1>sports-tracker</h1>
     <p>
-        <ul>
-            <li>
-                <a href="/create_event">Create Event</a>
-            </li>
-            <li>
-                <a href="/create_competition">Create competition</a>
-            </li>
-            <li>
-                <a href="/list_competitions">List competitions</a>
-            </li>
-            {% if cookies.get("show_archived") != "1" %}
-                <li>
-                    <button onclick="Cookies.set('show_archived', 1);window.location.reload();">Show Archived</button>
-                </li>
-            {% else %}
-                <li>
-                    <button onclick="Cookies.set('show_archived', 0);window.location.reload();">Hide Archived</button>
-                </li>
-            {% endif %}
-        </ul>
+        <a href="/create_event">Create Event</a>
     </p>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
+    <table>
+        <thead>
+            <tr>
+                <th>Event Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+                {% set link_to_event = "/event/"+event.id|string %}
+                <tr>
+                    <td>
+                        <a href="{{ link_to_event }}">{{ event.name }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>
+        {% if cookies.get("show_archived") != "1" %}
+            <li>
+                <button onclick="Cookies.set('show_archived', 1);window.location.reload();">Show Archived</button>
+            </li>
+        {% else %}
+            <li>
+                <button onclick="Cookies.set('show_archived', 0);window.location.reload();">Hide Archived</button>
+            </li>
+        {% endif %}
+    </ul>
+</p>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
 {% endblock %}

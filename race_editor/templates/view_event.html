@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block stylesheet_name %}
+    <link rel="stylesheet" href="/static/view_event.css" />
+{% endblock stylesheet_name %}
 {% block body %}
     <h1>Viewing {{ event.name }}</h1>
     <p>
@@ -7,7 +10,7 @@
     <table>
         <thead>
             <tr>
-                <th>Event Name</th>
+                <th>Competition Name</th>
                 <th>Scored</th>
                 <th>Gender</th>
                 <th>Y-Start</th>
@@ -16,14 +19,23 @@
         </thead>
         <tbody>
             {% for competition in competitions %}
+                {% set link_to_competition = "/competition/"+competition.id|string+"/edit" %}
                 <tr>
-                    <a href="/edit_competition/{{ competition }}">
-                        <td>{{ competition.name }}</td>
-                        <td>{{ competition.scored }}</td>
-                        <td>{{ competition.gender }}</td>
-                        <td>{{ competition.ystart }}</td>
-                        <td>{{ competition.start_time }}</td>
-                    </a>
+                    <td>
+                        <a class="competition-link" href="{{ link_to_competition }}">{{ competition.name }}</a>
+                    </td>
+                    <td>
+                        <a class="competition-link" href="{{ link_to_competition }}">{{ competition.scored }}</a>
+                    </td>
+                    <td>
+                        <a class="competition-link" href="{{ link_to_competition }}">{{ competition.gender }}</a>
+                    </td>
+                    <td>
+                        <a class="competition-link" href="{{ link_to_competition }}">{{ competition.ystart }}</a>
+                    </td>
+                    <td>
+                        <a class="competition-link" href="{{ link_to_competition }}">{{ competition.start_time }}</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -48,9 +48,11 @@ with app.app_context():
 
 @app.route("/")
 def index():
+    events = Event.query.all()
     return flask.render_template(
         "index.html",
-        cookies=flask.request.cookies
+        cookies=flask.request.cookies,
+        events=events,
     )
 
 
