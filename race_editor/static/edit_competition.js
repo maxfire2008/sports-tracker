@@ -125,20 +125,22 @@ function addResultElement(
         row.classList.add("archived");
     }
 
-    if (allow_delete === true) {
-        remove_cell.classList.add("remove-cell");
-        let remove_button = document.createElement("button");
-        if (archived === true) {
-            remove_button.textContent = "🗑️";
+    remove_cell.classList.add("remove-cell");
+    let remove_button = document.createElement("button");
+    if (archived === true) {
+        remove_button.textContent = "🗑️";
+        if (allow_delete === true) {
             remove_button.addEventListener("click", deleteButton);
-            remove_button.classList.add("remove-button");
         } else {
-            remove_button.textContent = "🗃️";
-            remove_button.addEventListener("click", archiveButton);
-            remove_button.classList.add("archive-button");
+            remove_button.disabled = true;
         }
-        remove_cell.appendChild(remove_button);
+        remove_button.classList.add("remove-button");
+    } else {
+        remove_button.textContent = "🗃️";
+        remove_button.addEventListener("click", archiveButton);
+        remove_button.classList.add("archive-button");
     }
+    remove_cell.appendChild(remove_button);
 
     row.appendChild(remove_cell);
 
