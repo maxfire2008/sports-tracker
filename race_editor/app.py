@@ -39,6 +39,8 @@ class Result(db.Model):
     # competition = db.relationship("Competition", backref=db.backref("competition", uselist=False))
     student_id = db.Column(db.String)
     score = db.Column(db.String)
+    points_awarded = db.Column(db.Integer)
+    place = db.Column(db.Integer)
     archived = db.Column(db.Boolean)
 
 
@@ -49,10 +51,35 @@ class BonusPoints(db.Model):
     name = db.Column(db.String)
     house = db.Column(db.String)
     points = db.Column(db.Integer)
+    archived = db.Column(db.Boolean)
 
 
 with app.app_context():
     db.create_all()
+
+
+def update_points_awarded(competition_id):
+    competition = Competition.query.filter(
+        Competition.id == competition_id).first()
+
+    results = Result.query.filter(
+        Result.competition_id == competition_id
+    ).all()
+
+    score_parser = sorters.sorters[competition.sorting_type]
+
+    results_sorted = score_parser.sorted(results)
+
+    results_placed = sorters.placed(
+        results_sorted,
+        score_parser.pure_key
+    )
+
+    for result in results_placed:
+        result[1].place = result[0]
+        result[1].points_awarded = max(20-result[0],0)
+
+    db.session.commit()
 
 
 @app.route("/")
@@ -168,9 +195,18 @@ def competition_edit(competition_id):
     show_archived = flask.request.cookies.get('show_archived', 0)
     competition = Competition.query.filter(
         Competition.id == competition_id).first()
+    if not competition:
+        return "404 Not Found", 404
+
+    update_points_awarded(competition_id)
 
     results = Result.query.filter(
         Result.competition_id == competition_id,
+        show_archived == "1" or Result.archived != True
+    ).all()
+
+    bonus_points = BonusPoints.query.filter(
+        BonusPoints.competition_id == competition_id,
         show_archived == "1" or Result.archived != True
     ).all()
 
@@ -183,12 +219,10 @@ def competition_edit(competition_id):
         student_db=yaml.safe_load(
             open("../reference/student_db.yaml")
         ),
-        results=sorted(
-            results,
-            key=lambda x:
-                score_parser.sorter(
-                    x.score, x.student_id
-                )
+        results=score_parser.sorted(results),
+        bonus_points=sorted(
+            bonus_points,
+            key=lambda x: x.house
         )
     )
 
@@ -196,10 +230,13 @@ def competition_edit(competition_id):
 @app.route("/api/save_competition/<competition_id>", methods=["PUT"])
 def api_save_competition(competition_id):
     # urllib.parse.urlparse("http://127.0.0.1:5000/edit_competition/500m_8_boys.yaml").path.split("/")[-1]
-    results = flask.request.get_json()
+    save_data = flask.request.get_json()
+
+    results = save_data["students"]
+
+    bonus_points = save_data["bonus_points"]
 
     for result in results:
-        print(result)
         DBResult = Result.query.filter(
             Result.id == result["id"],
             Result.competition_id == competition_id,
@@ -208,6 +245,17 @@ def api_save_competition(competition_id):
             DBResult.student_id = result["student_id"]
         if result["score"] != None:
             DBResult.score = result["score"]
+
+    for bonus_point in bonus_points:
+        print(bonus_point)
+        BonusPointResult = BonusPoints.query.filter(
+            BonusPoints.id == bonus_point["id"],
+            BonusPoints.competition_id == competition_id,
+        ).first()
+        if bonus_point["points"] != None:
+            BonusPointResult.points = bonus_point["points"]
+        print(bonus_point)
+
     db.session.commit()
 
     return "200 OK", 200

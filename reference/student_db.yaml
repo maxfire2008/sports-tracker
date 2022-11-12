@@ -1,113 +1,119 @@
-benjamin.jefferson.00:
-  house: Green
-  name: Benjamin Jefferson
-  preferred_name: Ben
-  ystart: 2013
-  gender: male
-cody.salazar.00:
-  house: Green
-  name: Cody Salazar
-  ystart: 2013
-  gender: male
-cody.green.00:
-  house: Green
-  name: Cody Green
-  ystart: 2013
-  gender: male
-connie.pratt.00:
-  house: Green
-  name: Connie Pratt
-  preferred_name: Con
-  ystart: 2014
-  gender: female
-cynthia.lewis.00:
-  house: Blue
-  name: Cynthia Lewis
-  preferred_name: Cindy
-  ystart: 2012
-  gender: female
-eddie.martinez.00:
-  house: Yellow
-  name: Eddie Martinez
-  preferred_name: Ed
-  ystart: 2013
-  gender: male
-felicia.cross.00:
-  house: Yellow
-  name: Felicia Cross
-  ystart: 2015
-  gender: female
-heather.stewart.00:
-  house: Green
-  name: Heather Stewart
-  ystart: 2014
-  gender: female
-janice.johnston.00:
-  house: Yellow
-  name: Janice Johnston
-  preferred_name: Jan
-  ystart: 2013
-  gender: female
-jennifer.summers.00:
-  house: Green
-  name: Jennifer Summers
-  preferred_name: Jen
-  ystart: 2015
-  gender: female
-joseph.brown.00:
-  house: Red
-  name: Joseph Brown
-  preferred_name: Joe
-  ystart: 2015
-  gender: male
-lindsey.matthews.00:
-  house: Red
-  name: Lindsey Matthews
-  preferred_name: Lin
-  ystart: 2012
-  gender: female
-lisa.king.00:
-  house: Blue
-  name: Lisa King
-  ystart: 2014
-  gender: female
-matthew.davies.00:
-  house: Red
-  name: Matthew Davies
-  preferred_name: Matt
-  ystart: 2013
-  gender: male
-michael.anderson.00:
-  house: Red
-  name: Michael Anderson
-  preferred_name: Mike
-  ystart: 2014
-  gender: male
-norma.fisher.00:
-  house: Green
-  name: Norma Fisher
-  ystart: 2013
-  gender: female
-richard.turner.00:
-  house: Blue
-  name: Richard Turner
-  ystart: 2012
-  gender: male
-stephanie.leblanc.00:
-  house: Blue
-  name: Stephanie Leblanc
-  ystart: 2012
-  gender: female
-susan.wagner.00:
-  house: Yellow
-  name: Susan Wagner
-  preferred_name: Sue
-  ystart: 2013
-  gender: female
-willie.golden.00:
-  house: Red
-  name: Willie Golden
-  preferred_name: Will
-  ystart: 2012
-  gender: male
+students:
+  benjamin.jefferson.00:
+    house: Green
+    name: Benjamin Jefferson
+    preferred_name: Ben
+    ystart: 2013
+    gender: male
+  cody.salazar.00:
+    house: Green
+    name: Cody Salazar
+    ystart: 2013
+    gender: male
+  cody.green.00:
+    house: Green
+    name: Cody Green
+    ystart: 2013
+    gender: male
+  connie.pratt.00:
+    house: Green
+    name: Connie Pratt
+    preferred_name: Con
+    ystart: 2014
+    gender: female
+  cynthia.lewis.00:
+    house: Blue
+    name: Cynthia Lewis
+    preferred_name: Cindy
+    ystart: 2012
+    gender: female
+  eddie.martinez.00:
+    house: Yellow
+    name: Eddie Martinez
+    preferred_name: Ed
+    ystart: 2013
+    gender: male
+  felicia.cross.00:
+    house: Yellow
+    name: Felicia Cross
+    ystart: 2015
+    gender: female
+  heather.stewart.00:
+    house: Green
+    name: Heather Stewart
+    ystart: 2014
+    gender: female
+  janice.johnston.00:
+    house: Yellow
+    name: Janice Johnston
+    preferred_name: Jan
+    ystart: 2013
+    gender: female
+  jennifer.summers.00:
+    house: Green
+    name: Jennifer Summers
+    preferred_name: Jen
+    ystart: 2015
+    gender: female
+  joseph.brown.00:
+    house: Red
+    name: Joseph Brown
+    preferred_name: Joe
+    ystart: 2015
+    gender: male
+  lindsey.matthews.00:
+    house: Red
+    name: Lindsey Matthews
+    preferred_name: Lin
+    ystart: 2012
+    gender: female
+  lisa.king.00:
+    house: Blue
+    name: Lisa King
+    ystart: 2014
+    gender: female
+  matthew.davies.00:
+    house: Red
+    name: Matthew Davies
+    preferred_name: Matt
+    ystart: 2013
+    gender: male
+  michael.anderson.00:
+    house: Red
+    name: Michael Anderson
+    preferred_name: Mike
+    ystart: 2014
+    gender: male
+  norma.fisher.00:
+    house: Green
+    name: Norma Fisher
+    ystart: 2013
+    gender: female
+  richard.turner.00:
+    house: Blue
+    name: Richard Turner
+    ystart: 2012
+    gender: male
+  stephanie.leblanc.00:
+    house: Blue
+    name: Stephanie Leblanc
+    ystart: 2012
+    gender: female
+  susan.wagner.00:
+    house: Yellow
+    name: Susan Wagner
+    preferred_name: Sue
+    ystart: 2013
+    gender: female
+  willie.golden.00:
+    house: Red
+    name: Willie Golden
+    preferred_name: Will
+    ystart: 2012
+    gender: male
 
+houses:
+ - Red
+ - Yellow
+ - Blue
+ - Green

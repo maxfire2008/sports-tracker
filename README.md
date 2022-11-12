@@ -16,8 +16,10 @@ Track sports carnivals!
   * [ ] Redirect to competition after creation
   * [x] Edit
   * etc
-* [x] Add restore button to archived items
+* [ ] Implement archival to everything
+  * [x] Add restore button to archived results
 * [x] implement events
+* [ ] Add security
 * [ ] Add participation points
 * [ ] Add autosave
 

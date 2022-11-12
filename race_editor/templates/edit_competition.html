@@ -37,6 +37,22 @@
         <tbody id="table_body">
         </tbody>
     </table>
+    <table>
+        <colgroup>
+            <col class="column-bonus-name">
+            <col class="column-bonus-house">
+            <col class="column-bonus-points">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Reason</th>
+                <th>House</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody id="bonus_points_table_body">
+        </tbody>
+    </table>
     <button id="saveButton">Save</button>
     <script>const studentDB = {{ student_db|tojson|safe }};</script>
     <script>const competitionID = {{ competition_id|tojson|safe }}</script>
@@ -51,6 +67,15 @@
                 {{ result.id|tojson|safe }},
                 {{ result.score|tojson|safe }},
                 {{ result.archived|tojson|safe }}
+            );
+            console.log("{{ result.student_id }}, {{ result.points_awarded }}");
+        {% endfor %}
+        {% for bonus_point in bonus_points %}
+            addBonusPointElement(
+                {{ bonus_point.id|tojson|safe }},
+                {{ bonus_point.name|tojson|safe }},
+                {{ bonus_point.house|tojson|safe }},
+                {{ bonus_point.points|tojson|safe }},
             );
         {% endfor %}
     </script>

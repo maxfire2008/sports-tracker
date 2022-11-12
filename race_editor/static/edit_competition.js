@@ -1,8 +1,8 @@
 function searchStudentDB(pattern) {
     student_list = [];
-    for (studentID of Object.keys(studentDB)) {
+    for (studentID of Object.keys(studentDB.students)) {
         // console.log(studentID);
-        student_entry = studentDB[studentID];
+        student_entry = studentDB.students[studentID];
         student_entry["id"] = studentID;
         student_list.push(student_entry);
     }
@@ -43,7 +43,7 @@ function formatName(realName, preferredName) {
 }
 
 function filterOutExisting(search_results) {
-    let JSONResults = toJSON();
+    let JSONResults = toJSON().students;
     let filtered = [];
     for (result of search_results) {
         if (!JSONResults.some((e) => e.student_id === result["item"]["id"])) {
@@ -95,8 +95,8 @@ function addResultElement(
 
     let name = document.createElement("td");
     name.textContent = formatName(
-        studentDB[studentID].name,
-        studentDB[studentID].preferred_name
+        studentDB.students[studentID].name,
+        studentDB.students[studentID].preferred_name
     );
     name.classList.add("student-name-cell");
     row.appendChild(name);
@@ -243,6 +243,30 @@ async function deleteButton() {
     }
 }
 
+async function addBonusPointElement(id, name, house, points) {
+    let row = document.createElement("tr");
+
+    let nameCell = document.createElement("td");
+    nameCell.textContent = name;
+    row.appendChild(nameCell);
+
+    let houseCell = document.createElement("td");
+    houseCell.textContent = house;
+    row.appendChild(houseCell);
+
+    let pointsCell = document.createElement("td");
+    let pointsInput = document.createElement("input");
+    pointsInput.dataset.bonusPointID = id;
+    pointsInput.value = points;
+    pointsInput.type="number";
+    pointsInput.classList.add("bonus_point_input");
+    pointsCell.appendChild(pointsInput);
+
+    row.appendChild(pointsCell);
+
+    document.getElementById("bonus_points_table_body").appendChild(row);
+}
+
 function toJSON() {
     let inputs = document.getElementsByClassName("score_input");
     let scores = [];
@@ -254,7 +278,22 @@ function toJSON() {
         };
         scores.push(result_content);
     }
-    return scores;
+
+    let bonus_points_inputs =
+        document.getElementsByClassName("bonus_point_input");
+    let bonus_points = [];
+    for (let i = 0; i < bonus_points_inputs.length; i++) {
+        let bonus_point_content = {
+            id: bonus_points_inputs[i].dataset.bonusPointID,
+            points: bonus_points_inputs[i].value,
+        };
+        bonus_points.push(bonus_point_content);
+    }
+
+    return {
+        students: scores,
+        bonus_points: bonus_points,
+    };
 }
 
 async function apiAddResult(studentID) {
@@ -312,7 +351,7 @@ async function apiSaveCompetition() {
     });
     let body = await response.text();
     console.log(body);
-    window.location.refresh();
+    window.location.reload();
 }
 
 document
