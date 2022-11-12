@@ -35,11 +35,20 @@ class Competition(db.Model):
 
 class Result(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    competition_id = db.Column(db.Integer)  # , db.ForeignKey(Competition.id))
+    competition_id = db.Column(db.Integer, db.ForeignKey(Competition.id))
     # competition = db.relationship("Competition", backref=db.backref("competition", uselist=False))
     student_id = db.Column(db.String)
     score = db.Column(db.String)
     archived = db.Column(db.Boolean)
+
+
+class BonusPoints(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    competition_id = db.Column(db.Integer, db.ForeignKey(Competition.id))
+    event_id = db.Column(db.Integer, db.ForeignKey(Event.id))
+    name = db.Column(db.String)
+    house = db.Column(db.String)
+    points = db.Column(db.Integer)
 
 
 with app.app_context():
@@ -224,6 +233,7 @@ def api_archive_result(result_id):
     result.archived = True
     db.session.commit()
     return "200 OK", 200
+
 
 @app.route("/api/restore_result/<result_id>", methods=["PATCH"])
 def api_restore_result(result_id):
