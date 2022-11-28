@@ -1,3 +1,7 @@
+.place-cell, .column-place {
+    width: 5vw;
+}
+
 .student-name-cell, .column-name {
     width: 60vw;
 }

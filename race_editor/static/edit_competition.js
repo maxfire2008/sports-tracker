@@ -89,9 +89,29 @@ function addResultElement(
     score = null,
     archived = false,
     allow_delete = true,
-    return_row = false
+    return_row = false,
+    place = null,
+    points = null
 ) {
     let row = document.createElement("tr");
+
+    let placeElem = document.createElement("td");
+    if (place !== null && place !== -1) {
+        placeElem.textContent = place+1;
+    } else {
+        placeElem.textContent = "Not calculated";
+    }
+    placeElem.classList.add("place-cell");
+    row.appendChild(placeElem);
+
+    let pointsElem = document.createElement("td");
+    if (points !== null) {
+        pointsElem.textContent = points;
+    } else {
+        pointsElem.textContent = "Not calculated";
+    }
+    pointsElem.classList.add("points-cell");
+    row.appendChild(pointsElem);
 
     let name = document.createElement("td");
     name.textContent = formatName(

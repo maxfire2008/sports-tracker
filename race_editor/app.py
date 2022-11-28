@@ -31,6 +31,7 @@ class Competition(db.Model):
     # auto populated just make a input for now
     event_id = db.Column(db.Integer, db.ForeignKey(Event.id))
     archived = db.Column(db.Boolean)  # not in form
+    sorting_options = db.Column(db.JSON)
 
 
 class Result(db.Model):
@@ -66,18 +67,20 @@ def update_points_awarded(competition_id):
         Result.competition_id == competition_id
     ).all()
 
-    score_parser = sorters.sorters[competition.sorting_type]
+    score_parser = sorters.sorters[competition.sorting_type](competition.sorting_options)
 
     results_sorted = score_parser.sorted(results)
 
     results_placed = sorters.placed(
         results_sorted,
-        score_parser.pure_key
+        score_parser.pure_key,
+        sorting_type=score_parser,
     )
 
     for result in results_placed:
+        # print(result, result[1].student_id)
         result[1].place = result[0]
-        result[1].points_awarded = max(20-result[0],0)
+        result[1].points_awarded = score_parser.get_points(result[0], result[1].score)
 
     db.session.commit()
 
@@ -210,7 +213,7 @@ def competition_edit(competition_id):
         show_archived == "1" or Result.archived != True
     ).all()
 
-    score_parser = sorters.sorters[competition.sorting_type]
+    score_parser = sorters.sorters[competition.sorting_type](competition.sorting_options)
 
     return flask.render_template(
         "edit_competition.html",

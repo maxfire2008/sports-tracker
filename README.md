@@ -22,6 +22,8 @@ Track sports carnivals!
 * [ ] Add security
 * [ ] Add participation points
 * [ ] Add autosave
+* [ ] competition and event details editing after creation
+* [ ] add column-points/points-cell CSS
 
 ## Planning
 ### `results` table

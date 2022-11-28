@@ -24,12 +24,16 @@
     </table>
     <table>
         <colgroup>
+            <col class="column-place">
+            <col class="column-points">
             <col class="column-name">
             <col class="column-score">
             <col class="column-delete">
         </colgroup>
         <thead>
             <tr>
+                <th>Place</th>
+                <th>Points</th>
                 <th>Student</th>
                 <th>Score</th>
             </tr>
@@ -66,7 +70,11 @@
                 {{ result.student_id|tojson|safe }},
                 {{ result.id|tojson|safe }},
                 {{ result.score|tojson|safe }},
-                {{ result.archived|tojson|safe }}
+                {{ result.archived|tojson|safe }},
+                true,
+                false,
+                {{ result.place }},
+                {{ result.points_awarded }}
             );
             console.log("{{ result.student_id }}, {{ result.points_awarded }}");
         {% endfor %}
