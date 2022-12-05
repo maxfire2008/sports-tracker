@@ -240,15 +240,25 @@ def api_save_competition(competition_id):
     bonus_points = save_data["bonus_points"]
 
     for result in results:
-        DBResult = Result.query.filter(
-            Result.id == result["id"],
-            Result.competition_id == competition_id,
-        ).first()
-        if result["student_id"] != None:
-            DBResult.student_id = result["student_id"]
-        if result["score"] != None:
-            DBResult.score = result["score"]
-
+        if result.get("id", "null") != "null":
+            DBResult = Result.query.filter(
+                Result.id == result["id"],
+                Result.competition_id == competition_id,
+            ).first()
+            if result.get("student_id") != None:
+                DBResult.student_id = result["student_id"]
+            if result.get("score") != None:
+                DBResult.score = result["score"]
+        else:
+            NewDBEntry = Result(
+                competition_id=competition_id,
+                student_id=result["student_id"],
+                archived=False
+            )
+            if result.get("score") != None:
+                NewDBEntry.score = result["score"]
+            db.session.add(NewDBEntry)
+            db.session.commit()
     for bonus_point in bonus_points:
         print(bonus_point)
         BonusPointResult = BonusPoints.query.filter(
@@ -262,19 +272,6 @@ def api_save_competition(competition_id):
     db.session.commit()
 
     return "200 OK", 200
-
-
-@app.route("/api/add_result/<competition_id>", methods=["POST"])
-def api_add_result(competition_id):
-    data = flask.request.get_json()
-    result = Result(
-        competition_id=competition_id,
-        student_id=data["student_id"],
-        archived=False
-    )
-    db.session.add(result)
-    db.session.commit()
-    return str(result.id), 200
 
 
 @app.route("/api/archive_result/<result_id>", methods=["PATCH"])
