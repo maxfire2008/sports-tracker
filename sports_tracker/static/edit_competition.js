@@ -308,6 +308,35 @@ async function addBonusPointElement(id, name, house, points) {
     document.getElementById("bonus_points_table_body").appendChild(row);
 }
 
+function freezePage() {
+    $("#saveButton").prop("disabled", true);
+    // add link to edit in new tab next to save
+    $("#saveButton").after(
+        '<a href="' +
+            window.location.href +
+            '" target="_blank" class="btn btn-primary">Open new tab</a>'
+    );
+    $("body").css("background-color", "#54bef0");
+    $("#titleLabel")
+        .parent()
+        .before(
+            '<div class="alert alert-danger" role="alert">This item has conflicts in the database.' +
+                "This page has been frozen as reference. You can choose the button at the bottom of the page" +
+                " to open a new tab to continue editing.</div>"
+        );
+    $("textarea").prop("disabled", true);
+    $("input").prop("disabled", true);
+    $("select").prop("disabled", true);
+    $("button").prop("disabled", true);
+    setTimeout(function () {
+        alert(
+            "This item has conflicts in the database." +
+                "This page has been frozen as reference. You can choose the button at the bottom of the page" +
+                " to open a new tab to continue editing."
+        );
+    }, 100);
+}
+
 function toJSON() {
     let inputs = document.getElementsByClassName("score_input");
     let scores = [];
@@ -368,7 +397,13 @@ async function apiSaveCompetition() {
     });
     let body = await response.text();
     console.log(body);
-    window.location.reload();
+    if (response.status === 200) {
+        window.location.reload();
+    } else if (response.status === 409) {
+        freezePage();
+    } else {
+        alert("Save failed" + response.status + response.statusText);
+    }
 }
 
 document
@@ -399,5 +434,5 @@ window.addEventListener("load", function () {
     document.getElementById("searchBox").value = "";
 });
 
-addEventListener('beforeunload', (event) => { });
-onbeforeunload = (event) => { };
+addEventListener("beforeunload", (event) => {});
+onbeforeunload = (event) => {};

@@ -20,7 +20,7 @@ def form_create_event():
     extensions.db.session.commit()
     return flask.redirect(
         flask.url_for(
-            "view_event",
+            "pages.view_event",
             event_id=event.id
         )
     )

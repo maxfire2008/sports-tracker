@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
+        "endwith",
         "stylesheet",
         "tojson",
+        "Whoah",
         "ystart"
     ],
     "python.linting.flake8Enabled": true,

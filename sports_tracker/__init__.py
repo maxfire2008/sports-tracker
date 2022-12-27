@@ -1,9 +1,7 @@
 import flask
 from . import CONFIG
 from . import extensions
-from .routes.api import api
-from .routes.forms import forms
-from .routes.pages import pages
+from . import routes
 
 
 def create_app():
@@ -16,8 +14,8 @@ def create_app():
     extensions.db.init_app(app)
     extensions.migrate.init_app(app, extensions.db)
 
-    app.register_blueprint(api)
-    app.register_blueprint(forms)
-    app.register_blueprint(pages)
+    app.register_blueprint(routes.api)
+    app.register_blueprint(routes.forms)
+    app.register_blueprint(routes.pages)
 
     return app

@@ -75,7 +75,7 @@ def competition_edit(competition_id):
         competition_id=competition_id,
         competition=competition,
         student_db=yaml.safe_load(
-            open("../reference/student_db.yaml")
+            open("reference/student_db.yaml")
         ),
         results=score_parser.sorted(results),
         bonus_points=sorted(

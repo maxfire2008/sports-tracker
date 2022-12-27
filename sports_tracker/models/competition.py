@@ -1,4 +1,6 @@
 from ..extensions import db
+from .event import Event
+
 
 class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)

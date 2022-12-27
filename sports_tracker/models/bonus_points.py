@@ -1,8 +1,16 @@
 from ..extensions import db
+from .competition import Competition
+from .event import Event
+
 
 class BonusPoints(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    competition_id = db.Column(db.Integer, db.ForeignKey(Competition.id))
+    competition_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            Competition.id
+        )
+    )
     event_id = db.Column(db.Integer, db.ForeignKey(Event.id))
     name = db.Column(db.String)
     house = db.Column(db.String)

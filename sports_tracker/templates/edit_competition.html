@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="/static/edit_competition.css" />
 {% endblock stylesheet_name %}
 {% block body %}
-    <h1>Editing {{ competition_id }}</h1>
+    <h1 id="titleLabel">Editing {{ competition_id }}</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flashes">

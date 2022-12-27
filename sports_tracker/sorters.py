@@ -63,7 +63,7 @@ def placed(results_sorted, key, sorting_type):
     for result in results_sorted:
         result_key = key(result)
         # print(repr(result.score))
-        print(sorting_type.valid(result.score))
+        # print(sorting_type.valid(result.score))
         if result.archived == False and sorting_type.valid(result.score):
             if result_key != last_score:
                 current_place = next_place
@@ -82,7 +82,7 @@ def placed(results_sorted, key, sorting_type):
                 -1,
                 result
             ])
-        print(placed_results[-1][0], placed_results[-1][1].student_id)
+        # print(placed_results[-1][0], placed_results[-1][1].student_id)
     return placed_results
 
 
