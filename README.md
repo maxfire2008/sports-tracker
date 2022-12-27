@@ -11,19 +11,25 @@ Track sports carnivals!
   * unknown
 
 ## To-do
-* [x] list all competitions in event
+
+### Easy tasks
+* [ ] Add autosave
+* [ ] add column-points/points-cell CSS
 * [x] implement competitions
   * [ ] Redirect to competition after creation
   * [x] Edit
   * etc
-* [ ] Implement archival to everything
-  * [x] Add restore button to archived results
-* [x] implement events
+
+### Hard tasks
 * [ ] Add security
 * [ ] Add participation points
-* [ ] Add autosave
 * [ ] competition and event details editing after creation
-* [ ] add column-points/points-cell CSS
+* [ ] Implement archival to everything
+  * [x] Add restore button to archived results
+
+### Completed tasks
+* [x] list all competitions in event
+* [x] implement events
 
 ## Planning
 ### `results` table

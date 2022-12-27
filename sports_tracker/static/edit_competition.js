@@ -1,3 +1,12 @@
+let counter = 0;
+
+function uniqueID() {
+    counter += Math.round(Math.random() * 25);
+    generated = counter;
+    counter += 25;
+    return generated;
+}
+
 function searchStudentDB(pattern) {
     student_list = [];
     for (studentID of Object.keys(studentDB.students)) {
@@ -85,7 +94,7 @@ function updateSearchHTML() {
 
 function addResultElement(
     studentID,
-    resultID,
+    resultID = null,
     score = null,
     archived = false,
     allow_delete = true,
@@ -97,7 +106,7 @@ function addResultElement(
 
     let placeElem = document.createElement("td");
     if (place !== null && place !== -1) {
-        placeElem.textContent = place+1;
+        placeElem.textContent = place + 1;
     } else {
         placeElem.textContent = "Not calculated";
     }
@@ -176,8 +185,8 @@ function addResultElement(
 }
 
 async function addStudentToResults(studentID) {
-    resultID = await apiAddResult(studentID);
-    addResultElement(studentID, resultID);
+    // resultID = await apiAddResult(studentID);
+    addResultElement(studentID);
 }
 
 function replaceElement(a, b) {
@@ -199,6 +208,10 @@ async function archiveButton() {
             "score_input"
         )[0];
     let result_id = score_input.dataset.resultID;
+    if (result_id === null) {
+        alert("Can't archive, doesn't yet exist in database.");
+        return null;
+    }
     let student_id = score_input.dataset.studentID;
     let archival_request_status = await apiArchiveResult(result_id);
     if (archival_request_status === 200) {
@@ -225,6 +238,10 @@ async function restoreButton() {
             "score_input"
         )[0];
     let result_id = score_input.dataset.resultID;
+    if (result_id === null) {
+        alert("Can't restore, doesn't yet exist in database.");
+        return null;
+    }
     let student_id = score_input.dataset.studentID;
     let restore_request_status = await apiRestoreResult(result_id);
     if (restore_request_status === 200) {
@@ -251,6 +268,10 @@ async function deleteButton() {
             this.parentElement.parentElement.getElementsByClassName(
                 "score_input"
             )[0].dataset.resultID;
+        if (result_id === null) {
+            alert("Can't delete, doesn't yet exist in database.");
+            return null;
+        }
         let delete_request_status = await apiDeleteResult(result_id);
         if (delete_request_status === 200) {
             this.parentElement.parentElement.remove();
@@ -278,7 +299,7 @@ async function addBonusPointElement(id, name, house, points) {
     let pointsInput = document.createElement("input");
     pointsInput.dataset.bonusPointID = id;
     pointsInput.value = points;
-    pointsInput.type="number";
+    pointsInput.type = "number";
     pointsInput.classList.add("bonus_point_input");
     pointsCell.appendChild(pointsInput);
 
@@ -314,30 +335,6 @@ function toJSON() {
         students: scores,
         bonus_points: bonus_points,
     };
-}
-
-async function apiAddResult(studentID) {
-    let response = await fetch("/api/add_result/" + competitionID, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            student_id: studentID,
-            competition_id: competitionID,
-        }),
-    });
-    if (response.status !== 200) {
-        alert(
-            "An error occurred in" +
-                "serverAddResult cite code: " +
-                response.status
-        );
-        throw Error("serverAddResult status " + response.status);
-    }
-    let body = await response.text();
-    console.log(body);
-    return body;
 }
 
 async function apiArchiveResult(resultID) {
@@ -401,3 +398,6 @@ document
 window.addEventListener("load", function () {
     document.getElementById("searchBox").value = "";
 });
+
+addEventListener('beforeunload', (event) => { });
+onbeforeunload = (event) => { };
