@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block stylesheet_name %}
-    <link rel="stylesheet" href="/static/edit_competition.css" />
+    <link rel="stylesheet" href="/static/edit_results.css" />
 {% endblock stylesheet_name %}
 {% block body %}
-    <h1 id="titleLabel">Editing {{ competition_id }}</h1>
+    <h1 id="titleLabel">Editing results for {{ competition_id }}</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flashes">
@@ -63,7 +63,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
-    <script src="/static/edit_competition.js"></script>
+    <script src="/static/edit_results.js"></script>
     <script>
         {% for result in results %}
             addResultElement(
@@ -73,8 +73,8 @@
                 {{ result.archived|tojson|safe }},
                 true,
                 false,
-                {{ result.place }},
-                {{ result.points_awarded }}
+                {{ result.place|tojson|safe }},
+                {{ result.points_awarded|tojson|safe }}
             );
             console.log("{{ result.student_id }}, {{ result.points_awarded }}");
         {% endfor %}

@@ -36,7 +36,7 @@ class ShortTime:
 
     def get_points(self, place, score):
         if place == -1:
-            return 0
+            return None
         return max(20-place, 0)
 
     def valid(self, score):

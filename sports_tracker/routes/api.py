@@ -6,9 +6,9 @@ from ..update_points_awarded import update_points_awarded
 api = flask.Blueprint('api', __name__, template_folder='../templates')
 
 
-@api.route("/api/save_competition/<competition_id>", methods=["PUT"])
+@api.route("/api/save_results/<competition_id>", methods=["PUT"])
 def api_save_competition(competition_id):
-    # urllib.parse.urlparse("http://127.0.0.1:5000/edit_competition/500m_8_boys.yaml").path.split("/")[-1]
+    # urllib.parse.urlparse("http://127.0.0.1:5000/edit_results/500m_8_boys.yaml").path.split("/")[-1]
     save_data = flask.request.get_json()
 
     results = save_data["students"]

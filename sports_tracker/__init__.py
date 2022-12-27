@@ -9,6 +9,7 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = \
         "postgresql://postgres:postgres@127.0.0.1:5431"
     app.config["SECRET_KEY"] = CONFIG.SECRET_KEY
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.url_map.strict_slashes = False
 
     extensions.db.init_app(app)

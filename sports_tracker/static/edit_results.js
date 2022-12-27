@@ -108,7 +108,14 @@ function addResultElement(
     if (place !== null && place !== -1) {
         placeElem.textContent = place + 1;
     } else {
-        placeElem.textContent = "Not calculated";
+        placeElem.textContent = "NC";
+        placeElem.title = "Not Calculated";
+
+        let placeElemQuestionMark = document.createElement("sup");
+        placeElemQuestionMark.textContent = "[?]";
+        placeElemQuestionMark.style.color = "blue";
+
+        placeElem.appendChild(placeElemQuestionMark);
     }
     placeElem.classList.add("place-cell");
     row.appendChild(placeElem);
@@ -117,7 +124,14 @@ function addResultElement(
     if (points !== null) {
         pointsElem.textContent = points;
     } else {
-        pointsElem.textContent = "Not calculated";
+        pointsElem.textContent = "NC";
+        pointsElem.title = "Not Calculated";
+
+        let pointsElemQuestionMark = document.createElement("sup");
+        pointsElemQuestionMark.textContent = "[?]";
+        pointsElemQuestionMark.style.color = "blue";
+
+        pointsElem.appendChild(pointsElemQuestionMark);
     }
     pointsElem.classList.add("points-cell");
     row.appendChild(pointsElem);
@@ -388,7 +402,7 @@ async function apiDeleteResult(resultID) {
 }
 
 async function apiSaveCompetition() {
-    let response = await fetch("/api/save_competition/" + competitionID, {
+    let response = await fetch("/api/save_results/" + competitionID, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
