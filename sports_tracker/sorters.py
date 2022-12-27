@@ -43,7 +43,7 @@ class ShortTime:
         try:
             float(pytimeparse.timeparse.timeparse(score))
             return True
-        except:
+        except Exception:
             pass
         try:
             int(score)
