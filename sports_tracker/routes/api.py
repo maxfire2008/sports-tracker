@@ -15,35 +15,35 @@ def api_save_competition(competition_id):
 
     for result in results:
         if result.get("id", "null") != "null":
-            DBResult = Result.query.filter(
-                Result.id == result["id"],
-                Result.competition_id == competition_id,
+            DBResult = models.result.Result.query.filter(
+                models.result.Result.id == result["id"],
+                models.result.Result.competition_id == competition_id,
             ).first()
             if result.get("student_id") != None:
                 DBResult.student_id = result["student_id"]
             if result.get("score") != None:
                 DBResult.score = result["score"]
         else:
-            NewDBEntry = Result(
+            NewDBEntry = models.result.Result(
                 competition_id=competition_id,
                 student_id=result["student_id"],
                 archived=False
             )
-            if result.get("score") != None:
+            if result.get("score") is not None:
                 NewDBEntry.score = result["score"]
-            db.session.add(NewDBEntry)
-            db.session.commit()
+            extensions.db.session.add(NewDBEntry)
+            extensions.db.session.commit()
     for bonus_point in bonus_points:
         print(bonus_point)
-        BonusPointResult = BonusPoints.query.filter(
-            BonusPoints.id == bonus_point["id"],
-            BonusPoints.competition_id == competition_id,
+        BonusPointResult = models.bonus_points.BonusPoints.query.filter(
+            models.bonus_points.BonusPoints.id == bonus_point["id"],
+            models.bonus_points.BonusPoints.competition_id == competition_id,
         ).first()
         if bonus_point["points"] != None:
             BonusPointResult.points = bonus_point["points"]
         print(bonus_point)
 
-    db.session.commit()
+    extensions.migratedb.session.commit()
 
     return "200 OK", 200
 
