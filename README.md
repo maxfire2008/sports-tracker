@@ -12,6 +12,10 @@ Track sports carnivals!
 
 ## To-do
 
+### Roadmap
+* [ ] Add points totaling
+* [ ] Add participation points
+
 ### Easy tasks
 * [ ] Add autosave
 * [ ] add column-points/points-cell CSS
@@ -22,7 +26,6 @@ Track sports carnivals!
 
 ### Hard tasks
 * [ ] Add security
-* [ ] Add participation points
 * [ ] competition and event details editing after creation
 * [ ] Implement archival to everything
   * [x] Add restore button to archived results
