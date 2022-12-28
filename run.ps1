@@ -6,4 +6,4 @@ py -3.10 -m flask db init
 py -3.10 -m flask db migrate
 py -3.10 -m flask db upgrade
 
-py -3.10 -m flask run
+py -3.10 -m flask run -p 5004

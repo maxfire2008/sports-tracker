@@ -15,6 +15,7 @@ Track sports carnivals!
 ### Roadmap
 * [ ] Add points totaling
 * [ ] Add participation points
+* [ ] Add event locking so that it can't be changed once entered
 
 ### Easy tasks
 * [ ] Add autosave
