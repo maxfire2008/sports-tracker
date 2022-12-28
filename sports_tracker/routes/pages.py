@@ -71,7 +71,7 @@ def competition_edit(competition_id):
         competition.sorting_options)
 
     return flask.render_template(
-        "edit_competition.html",
+        "edit_results.html",
         competition_id=competition_id,
         competition=competition,
         student_db=yaml.safe_load(
