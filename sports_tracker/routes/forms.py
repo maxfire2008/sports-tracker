@@ -70,6 +70,10 @@ def form_create_competition():
         event_id=event_id,
     )
 
+    # participation_points = flask.request.form.get("scored", False)
+    # if str(participation_points).lower() in ["true", "checked", "on"]:
+    #     for house in
+
     extensions.db.session.add(competition)
     extensions.db.session.commit()
 

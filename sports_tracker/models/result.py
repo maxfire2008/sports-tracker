@@ -1,5 +1,6 @@
 from ..extensions import db
 from .competition import Competition
+from .student import Student
 
 
 class Result(db.Model):
@@ -17,7 +18,12 @@ class Result(db.Model):
     #       uselist=False
     #   )
     # )
-    student_id = db.Column(db.String)
+    student_id = db.Column(
+        db.String,
+        db.ForeignKey(
+            Student.id
+        )
+    )
     score = db.Column(db.String)
     points_awarded = db.Column(db.Integer)
     place = db.Column(db.Integer)
