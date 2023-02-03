@@ -21,27 +21,65 @@ fake.add_provider(house_provider)
 
 students = {}
 
-students_to_generate = 20
+students_to_generate = 1000
 
 for i in range(students_to_generate):
-    if students_to_generate-i != 1:
-        name = fake.name()
+    profile = fake.profile()
+
+    name = profile["name"]
+
+    # preferred_name username with only letters
+    preferred_name = "".join(
+        [c for c in profile["username"] if c.isalpha()]
+    )
+
     name_with_dots = name.replace(" ", ".")
+
     username_discriminator = 0
     while name_with_dots+str(username_discriminator).rjust(2, "0") in students:
         username_discriminator += 1
-        print(name_with_dots,"is duplicated")
-    username = (name_with_dots+"."+str(username_discriminator).rjust(2, "0")).lower()
+        print(name_with_dots, "is duplicated")
+
+    username = (name_with_dots+"." +
+                str(username_discriminator).rjust(2, "0")).lower()
+
+    if profile["sex"] == "M":
+        gender = "male"
+    else:
+        gender = "female"
+
     students[username] = {
+        "house": fake.house(),
         "name": name,
+        "preferred_name": preferred_name,
         "ystart": fake.ystart(),
-        "house": fake.house()
+        "gender": gender
     }
 
-print(yaml.dump(students))
+# benjamin.jefferson.00:
+    # house: Green
+    # name: Benjamin Jefferson
+    # preferred_name: Ben
+    # ystart: 2013
+    # gender: male
+
+students_db_text = yaml.dump(
+    {
+        "students": students,
+        "houses": [
+            "Red",
+            "Yellow",
+            "Blue",
+            "Green"
+        ]
+    }
+)
+
+with open("student_db.yaml", "w") as f:
+    f.write(students_db_text)
+
 
 # students_split_by_ystart = {}
 
 # for username, student in students.items():
 #     if student["year"] in students_split_by_ystart:
-

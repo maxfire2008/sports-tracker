@@ -46,7 +46,7 @@ def insert_dummy_data(dry_run=True):
                             models.House.name == student_data['house']
                         ).first().id,
                         import_batch_id=import_id,
-                        archived = False,
+                        archived=False,
                     )
                 )
         if not dry_run:
@@ -56,6 +56,7 @@ def insert_dummy_data(dry_run=True):
 
 
 if __name__ == "__main__":
+    # DELETE FROM student;
     insert_dummy_data(
         sys.argv[1] != "--dry-run=0"
     )
