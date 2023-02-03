@@ -4,11 +4,11 @@ from . import sorters
 
 
 def update_points_awarded(competition_id):
-    competition = models.competition.Competition.query.filter(
-        models.competition.Competition.id == competition_id).first()
+    competition = models.Competition.query.filter(
+        models.Competition.id == competition_id).first()
 
-    results = models.result.Result.query.filter(
-        models.result.Result.competition_id == competition_id
+    results = models.Result.query.filter(
+        models.Result.competition_id == competition_id
     ).all()
 
     score_parser = sorters.sorters[competition.sorting_type](

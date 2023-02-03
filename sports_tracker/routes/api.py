@@ -2,6 +2,7 @@ import flask
 from .. import extensions
 from .. import models
 from ..update_points_awarded import update_points_awarded
+from ..participation_points import add_participation_points
 
 api = flask.Blueprint('api', __name__, template_folder='../templates')
 
@@ -13,7 +14,7 @@ def api_save_competition(competition_id):
 
     results = save_data["students"]
 
-    bonus_points = save_data["bonus_points"]
+    house_points = save_data["house_points"]
     for result in results:
         print(result)
         already_exists_query = models.Result.query.filter(
@@ -45,13 +46,13 @@ def api_save_competition(competition_id):
                 NewDBEntry.score = result["score"]
             extensions.db.session.add(NewDBEntry)
 
-    for bonus_point in bonus_points:
-        BonusPointResult = models.BonusPoints.query.filter(
-            models.BonusPoints.id == bonus_point["id"],
-            models.BonusPoints.competition_id == competition_id,
+    for house_point in house_points:
+        HousePointResult = models.HousePoints.query.filter(
+            models.HousePoints.id == house_point["id"],
+            models.HousePoints.competition_id == competition_id,
         ).first()
-        if bonus_point["points"] is not None:
-            BonusPointResult.points = bonus_point["points"]
+        if house_point["points"] is not None:
+            HousePointResult.points = house_point["points"]
 
     extensions.db.session.commit()
     update_points_awarded(competition_id)
@@ -90,4 +91,44 @@ def api_delete_result(result_id):
     query.delete()
     extensions.db.session.commit()
     update_points_awarded(competition_id)
+    return "200 OK", 200
+
+
+@api.route("/api/archive_house_points/<result_id>", methods=["PATCH"])
+def api_archive_house_points(result_id):
+    # return "200 OK", 200
+    house_point = models.HousePoints.query.filter(
+        models.HousePoints.id == result_id).first()
+    house_point.archived = True
+    extensions.db.session.commit()
+    update_points_awarded(house_point.competition_id)
+    return "200 OK", 200
+
+
+@api.route("/api/restore_house_points/<result_id>", methods=["PATCH"])
+def api_restore_house_points(result_id):
+    # return "200 OK", 200
+    house_point = models.HousePoints.query.filter(
+        models.HousePoints.id == result_id).first()
+    house_point.archived = False
+    extensions.db.session.commit()
+    update_points_awarded(house_point.competition_id)
+    return "200 OK", 200
+
+
+@api.route("/api/delete_house_points/<result_id>", methods=["DELETE"])
+def api_delete_house_points(result_id):
+    # return "200 OK", 200
+    query = models.HousePoints.query.filter(
+        models.HousePoints.id == result_id)
+    competition_id = query.first().competition_id
+    query.delete()
+    extensions.db.session.commit()
+    update_points_awarded(competition_id)
+    return "200 OK", 200
+
+
+@api.route("/api/add_participation_points/<competition_id>", methods=["POST"])
+def api_add_participation_points(competition_id):
+    add_participation_points(competition_id)
     return "200 OK", 200

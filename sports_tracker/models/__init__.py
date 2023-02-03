@@ -1,4 +1,4 @@
-from .bonus_points import BonusPoints
+from .house_points import HousePoints
 from .competition import Competition
 from .event import Event
 from .house import House

@@ -15,5 +15,5 @@ class Student(db.Model):
         )
     )
     import_batch_id = db.Column(db.String)
-    archived = db.Column(db.Boolean)
+    archived = db.Column(db.Boolean, nullable=False)
     archived_time = db.Column(db.DateTime)

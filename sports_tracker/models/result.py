@@ -27,5 +27,5 @@ class Result(db.Model):
     score = db.Column(db.String)
     points_awarded = db.Column(db.Integer)
     place = db.Column(db.Integer)
-    archived = db.Column(db.Boolean)
+    archived = db.Column(db.Boolean, nullable=False)
     archived_time = db.Column(db.DateTime)

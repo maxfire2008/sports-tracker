@@ -29,3 +29,7 @@ input {
     min-width: 2vw;
     max-width: 50%;
 }
+
+.remove-button.disabled, .archive-button.disabled, .restore-button.disabled {
+    background-color: red;
+}

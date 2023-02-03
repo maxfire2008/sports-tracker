@@ -41,11 +41,16 @@
         <tbody id="table_body">
         </tbody>
     </table>
+    <h2>House Points</h2>
+    <p>
+        <button id="addParticipationPointsButton">Add participation points</button>
+    </p>
     <table>
         <colgroup>
-            <col class="column-bonus-name">
-            <col class="column-bonus-house">
-            <col class="column-bonus-points">
+            <col class="column-house-name">
+            <col class="column-house-house">
+            <col class="column-house-points">
+            <col class="column-house-delete">
         </colgroup>
         <thead>
             <tr>
@@ -54,7 +59,7 @@
                 <th>Points</th>
             </tr>
         </thead>
-        <tbody id="bonus_points_table_body">
+        <tbody id="house_points_table_body">
         </tbody>
     </table>
     <button id="saveButton">Save</button>
@@ -78,12 +83,13 @@
             );
             console.log("{{ result.student_id }}, {{ result.points_awarded }}");
         {% endfor %}
-        {% for bonus_point in bonus_points %}
-            addBonusPointElement(
-                {{ bonus_point.id|tojson|safe }},
-                {{ bonus_point.name|tojson|safe }},
-                {{ bonus_point.house|tojson|safe }},
-                {{ bonus_point.points|tojson|safe }},
+        {% for house_point in house_points %}
+            addHousePointElement(
+                {{ house_point.id|tojson|safe }},
+                {{ house_point.name|tojson|safe }},
+                {{ house_point.house|tojson|safe }},
+                {{ house_point.points|tojson|safe }},
+                archived = {{ house_point.archived|tojson|safe }},
             );
         {% endfor %}
     </script>

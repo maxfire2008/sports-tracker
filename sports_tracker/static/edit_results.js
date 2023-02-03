@@ -7,6 +7,30 @@ function uniqueID() {
     return generated;
 }
 
+let progressItems = [];
+
+function updateProgressNotice() {
+    if (progressItems.length > 0) {
+        document.body.classList.add('progress-cursor');
+        // console.log("Progress: " + progressItems.length + " items");
+    } else {
+        document.body.classList.remove('progress-cursor');
+        // console.log("No progress happening");
+    }
+}
+
+function addWaitItem() {
+    let progressID = uniqueID();
+    progressItems.push(progressID);
+    updateProgressNotice();
+    return progressID;
+}
+
+function removeWaitItem(waitID) {
+    progressItems = progressItems.filter((e) => e !== waitID);
+    updateProgressNotice();
+}
+
 function searchStudentDB(pattern) {
     student_list = [];
     for (studentID of Object.keys(studentDB.students)) {
@@ -86,6 +110,14 @@ function updateSearchHTML() {
         button.addEventListener("click", function () {
             addStudentToResults(this.dataset.studentID);
         });
+
+        if (result.archived == true) {
+            cell.classList.add("archived");
+            cell.title += "This student is archived";
+            button.classList.add("archived");
+            button.title += "This student is archived";
+        }
+
         cell.appendChild(button);
         row.appendChild(cell);
         document.getElementById("search_table_body").appendChild(row);
@@ -176,11 +208,19 @@ function addResultElement(
             remove_button.addEventListener("click", deleteButton);
         } else {
             remove_button.disabled = true;
+            remove_button.classList.add("disabled");
+            remove_button.title = "Press save to allow full deletion";
         }
         remove_button.classList.add("remove-button");
     } else {
         remove_button.textContent = "🗃️";
-        remove_button.addEventListener("click", archiveButton);
+        if (resultID !== null) {
+            remove_button.addEventListener("click", archiveButton);
+        } else {
+            remove_button.disabled = true;
+            remove_button.classList.add("disabled");
+            remove_button.title = "Press save before archiving";
+        }
         remove_button.classList.add("archive-button");
     }
     remove_cell.appendChild(remove_button);
@@ -191,11 +231,10 @@ function addResultElement(
         return row;
     } else {
         document.getElementById("table_body").appendChild(row);
+        document.getElementById("searchBox").value = "";
+        document.getElementById("search_table_body").replaceChildren();
+        document.getElementById("searchBox").focus();
     }
-
-    document.getElementById("searchBox").value = "";
-    document.getElementById("search_table_body").replaceChildren();
-    document.getElementById("searchBox").focus();
 }
 
 async function addStudentToResults(studentID) {
@@ -204,12 +243,17 @@ async function addStudentToResults(studentID) {
 }
 
 function replaceElement(a, b) {
+    console.log(a, b);
     if (a.previousElementSibling) {
         a.previousElementSibling.insertAdjacentElement("afterend", b);
     } else {
         try {
             a.parentElement.insertAdjacentElement("afterbegin", b);
-        } catch (TypeError) {
+        } catch (e) {
+            if (!e instanceof TypeError) {
+                throw e;
+            }
+            console.log(e);
             confirm("Whoah! Slow down.");
         }
     }
@@ -222,8 +266,11 @@ async function archiveButton() {
             "score_input"
         )[0];
     let result_id = score_input.dataset.resultID;
-    if (result_id === null) {
-        alert("Can't archive, doesn't yet exist in database.");
+    console.log(result_id);
+    if (result_id === "null" || result_id === null) {
+        alert(
+            "Can't archive, doesn't yet exist in database. Please press the save button first."
+        );
         return null;
     }
     let student_id = score_input.dataset.studentID;
@@ -298,7 +345,92 @@ async function deleteButton() {
     }
 }
 
-async function addBonusPointElement(id, name, house, points) {
+async function archiveButtonForHousePoints() {
+    let house_point_input =
+        this.parentElement.parentElement.getElementsByClassName(
+            "house_point_input"
+        )[0];
+    let housePointID = house_point_input.dataset.housePointID;
+    let housePointName = house_point_input.dataset.housePointName;
+    let housePointHouseID = house_point_input.dataset.housePointHouseID;
+
+    let archival_request_status = await apiArchiveHousePoints(housePointID);
+    if (archival_request_status === 200) {
+        row = await addHousePointElement(
+            housePointID,
+            housePointName,
+            housePointHouseID,
+            house_point_input.value,
+            true,
+            false,
+            true
+        );
+        replaceElement(this.parentElement.parentElement, row);
+    } else {
+        alert(
+            "Error in archival. Inform support of the error code " +
+                archival_request_status
+        );
+    }
+}
+
+async function restoreButtonForHousePoints() {
+    let house_point_input =
+        this.parentElement.parentElement.getElementsByClassName(
+            "house_point_input"
+        )[0];
+    let housePointID = house_point_input.dataset.housePointID;
+    let housePointName = house_point_input.dataset.housePointName;
+    let housePointHouseID = house_point_input.dataset.housePointHouseID;
+
+    let restore_request_status = await apiRestoreHousePoints(housePointID);
+    if (restore_request_status === 200) {
+        row = await addHousePointElement(
+            housePointID,
+            housePointName,
+            housePointHouseID,
+            house_point_input.value,
+            false,
+            true,
+            true
+        );
+        replaceElement(this.parentElement.parentElement, row);
+    } else {
+        alert(
+            "Error in restore. Inform support of the error code " +
+                restore_request_status
+        );
+    }
+}
+
+async function deleteButtonForHousePoints() {
+    if (confirm("Are you sure you want to delete?")) {
+        let house_point_input =
+            this.parentElement.parentElement.getElementsByClassName(
+                "house_point_input"
+            )[0];
+        let housePointID = house_point_input.dataset.housePointID;
+        let delete_request_status = await apiDeleteHousePoints(housePointID);
+        if (delete_request_status === 200) {
+            this.parentElement.parentElement.remove();
+        } else {
+            alert(
+                "Error in deletion. Inform support of the error code " +
+                    delete_request_status
+            );
+        }
+    }
+}
+
+async function addHousePointElement(
+    id,
+    name,
+    house,
+    points,
+    archived = false,
+    allow_delete = true,
+    return_row = false
+) {
     let row = document.createElement("tr");
 
     let nameCell = document.createElement("td");
@@ -311,15 +443,54 @@ async function addBonusPointElement(id, name, house, points) {
 
     let pointsCell = document.createElement("td");
     let pointsInput = document.createElement("input");
-    pointsInput.dataset.bonusPointID = id;
+    pointsInput.dataset.housePointID = id;
+    pointsInput.dataset.housePointName = name;
+    pointsInput.dataset.housePointHouseID = house;
     pointsInput.value = points;
     pointsInput.type = "number";
-    pointsInput.classList.add("bonus_point_input");
+    pointsInput.classList.add("house_point_input");
     pointsCell.appendChild(pointsInput);
+
+    let remove_cell = document.createElement("td");
+
+    if (archived === true) {
+        let restore_button = document.createElement("button");
+        restore_button.textContent = "♻️";
+        restore_button.addEventListener("click", restoreButtonForHousePoints);
+
+        restore_button.classList.add("restore-button");
+        remove_cell.appendChild(restore_button);
+        row.classList.add("archived");
+    }
+
+    remove_cell.classList.add("remove-cell");
+    let remove_button = document.createElement("button");
+    if (archived === true) {
+        remove_button.textContent = "🗑️";
+        if (allow_delete === true) {
+            remove_button.addEventListener("click", deleteButtonForHousePoints);
+        } else {
+            remove_button.disabled = true;
+            remove_button.classList.add("disabled");
+            remove_button.title = "Press save to allow full deletion";
+        }
+        remove_button.classList.add("remove-button");
+    } else {
+        remove_button.textContent = "🗃️";
+        remove_button.addEventListener("click", archiveButtonForHousePoints);
+        remove_button.classList.add("archive-button");
+    }
+    remove_cell.appendChild(remove_button);
+
+    row.appendChild(remove_cell);
 
     row.appendChild(pointsCell);
 
-    document.getElementById("bonus_points_table_body").appendChild(row);
+    if (return_row) {
+        return row;
+    } else {
+        document.getElementById("house_points_table_body").appendChild(row);
+    }
 }
 
 function freezePage() {
@@ -363,45 +534,91 @@ function toJSON() {
         scores.push(result_content);
     }
 
-    let bonus_points_inputs =
-        document.getElementsByClassName("bonus_point_input");
-    let bonus_points = [];
-    for (let i = 0; i < bonus_points_inputs.length; i++) {
-        let bonus_point_content = {
-            id: bonus_points_inputs[i].dataset.bonusPointID,
-            points: bonus_points_inputs[i].value,
+    let house_points_inputs =
+        document.getElementsByClassName("house_point_input");
+    let house_points = [];
+    for (let i = 0; i < house_points_inputs.length; i++) {
+        let house_point_content = {
+            id: house_points_inputs[i].dataset.housePointID,
+            points: house_points_inputs[i].value,
         };
-        bonus_points.push(bonus_point_content);
+        house_points.push(house_point_content);
     }
 
     return {
         students: scores,
-        bonus_points: bonus_points,
+        house_points: house_points,
     };
 }
 
 async function apiArchiveResult(resultID) {
+    let waitID = addWaitItem();
     let response = await fetch("/api/archive_result/" + resultID, {
         method: "PATCH",
     });
+    removeWaitItem(waitID);
     return response.status;
 }
 
 async function apiRestoreResult(resultID) {
+    let waitID = addWaitItem();
     let response = await fetch("/api/restore_result/" + resultID, {
         method: "PATCH",
     });
+    removeWaitItem(waitID);
     return response.status;
 }
 
 async function apiDeleteResult(resultID) {
+    let waitID = addWaitItem();
     let response = await fetch("/api/delete_result/" + resultID, {
         method: "DELETE",
     });
+    removeWaitItem(waitID);
+    return response.status;
+}
+
+async function apiArchiveHousePoints(resultID) {
+    let waitID = addWaitItem();
+    let response = await fetch("/api/archive_house_points/" + resultID, {
+        method: "PATCH",
+    });
+    removeWaitItem(waitID);
+    return response.status;
+}
+
+async function apiRestoreHousePoints(resultID) {
+    let waitID = addWaitItem();
+    let response = await fetch("/api/restore_house_points/" + resultID, {
+        method: "PATCH",
+    });
+    removeWaitItem(waitID);
+    return response.status;
+}
+
+async function apiDeleteHousePoints(resultID) {
+    let waitID = addWaitItem();
+    let response = await fetch("/api/delete_house_points/" + resultID, {
+        method: "DELETE",
+    });
+    removeWaitItem(waitID);
+    return response.status;
+}
+
+async function apiAddParticipationPoints() {
+    let waitID = addWaitItem();
+    let response = await fetch(
+        "/api/add_participation_points/" + competitionID,
+        {
+            method: "POST",
+        }
+    );
+    removeWaitItem(waitID);
     return response.status;
 }
 
 async function apiSaveCompetition() {
+    let waitID = addWaitItem();
     let response = await fetch("/api/save_results/" + competitionID, {
         method: "PUT",
         headers: {
@@ -411,12 +628,22 @@ async function apiSaveCompetition() {
     });
     let body = await response.text();
     console.log(body);
+    removeWaitItem(waitID);
     if (response.status === 200) {
         window.location.reload();
     } else if (response.status === 409) {
         freezePage();
     } else {
         alert("Save failed" + response.status + response.statusText);
+    }
+}
+
+async function addParticipationPointsButtonAction() {
+    let response = await apiAddParticipationPoints();
+    if (response === 200) {
+        apiSaveCompetition();
+    } else {
+        alert("Error adding participation points");
     }
 }
 
@@ -447,6 +674,10 @@ document
 window.addEventListener("load", function () {
     document.getElementById("searchBox").value = "";
 });
+
+document
+    .getElementById("addParticipationPointsButton")
+    .addEventListener("click", addParticipationPointsButtonAction);
 
 addEventListener("beforeunload", (event) => {});
 onbeforeunload = (event) => {};

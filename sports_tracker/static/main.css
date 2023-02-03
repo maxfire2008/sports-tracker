@@ -12,3 +12,24 @@ td > a {
     color: black;
     text-decoration: none;
 }
+
+html {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    margin: 0.5%;
+    padding: 2%;
+    min-height: 95%;
+    width: 95%;
+}
+
+button {
+    cursor: pointer;
+}
+
+.progress-cursor *, .progress-cursor {
+    cursor: progress;
+}

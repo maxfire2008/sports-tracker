@@ -12,6 +12,6 @@ class Competition(db.Model):
     start_time = db.Column(db.DateTime)  # date and time
     # auto populated just make a input for now
     event_id = db.Column(db.Integer, db.ForeignKey(Event.id))
-    archived = db.Column(db.Boolean)  # not in form
+    archived = db.Column(db.Boolean, nullable=False)  # not in form
     archived_time = db.Column(db.DateTime)
     sorting_options = db.Column(db.JSON)

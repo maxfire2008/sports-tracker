@@ -25,7 +25,8 @@ def insert_dummy_data(dry_run=True):
                     models.House(
                         name=house,
                         color_code=color.Color(house).hex,
-                        color_name=house
+                        color_name=house,
+                        archived=False,
                     )
                 )
         for student_id, student_data in student_db["students"].items():
@@ -44,7 +45,8 @@ def insert_dummy_data(dry_run=True):
                         house=models.House.query.filter(
                             models.House.name == student_data['house']
                         ).first().id,
-                        import_batch_id=import_id
+                        import_batch_id=import_id,
+                        archived = False,
                     )
                 )
         if not dry_run:
